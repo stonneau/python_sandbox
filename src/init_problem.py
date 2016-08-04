@@ -37,6 +37,7 @@ def init_problem(p, N, c_input, t_end_phases, dt):
 	         "N" 	  		: [array(phase) for phase in N],
 	         "c_init" 		: c_input[0],
 	         "c_end" 		: c_input[1],
+	         "dt" 			: dt,
 	         #t_phases in updated to each starting phase time and one final phase
 	         "t_init_phases": [0] +[t_end_phases[i] + dt for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
 	         
