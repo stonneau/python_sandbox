@@ -26,17 +26,17 @@ def __def_access_param_method(param, keyword, fun):
 #  which formulation is adopted: either COM acceleration is the variable, or forces are the variables
 #  \param p list of 3d contact positions
 #  \param N list of 3d contact normals
-#  \param c_input: list of exactly two 3D vectors, indicating start and end positions of the com 
+#  \param x_input: list of exactly two 6D vectors, indicating start and end positions and velocities of the com 
 #  \param t_phases list of ending times for each contact phases. For instance if first phase last 1 second, and 
 #  second lasts 0.5 second, t_phases=[1,1.5] 
 #  \param dt: step size
 #  \return a dictionnary param, used throughout the optimization problem to set
 #  up constraints and cost functions
-def init_problem(p, N, c_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81):
+def init_problem(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81):
 	param = {"p"      		: [array(phase) for phase in p], 
 	         "N" 	  		: [array(phase) for phase in N],
-	         "c_init" 		: c_input[0],
-	         "c_end" 		: c_input[1],
+	         "x_init" 		: x_input[0],
+	         "x_end" 		: x_input[1],
 	         "dt" 			: dt,
 	         "mass" 		: mass,
 	         "mu" 			: mu,

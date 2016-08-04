@@ -15,7 +15,7 @@ from numpy import arange
 #  phase is given by the switching time phase. Thus the 
 #  resulting matrix is simply a diagonal stacking of the cone
 #  active at a given frame
-#  \param param requires "cones", and "phases"
+#  \param param requires "cones", "phases", and "dt"
 #  \return size of configuration
 def cones_constraint(param):
 	cones  = param["cones"]()	
