@@ -46,3 +46,7 @@ N = [[[7.850462293418875e-17, -6.162975822039155e-33, 1.0],
   [-0.4539897323218329, -3.823790491608512e-05, 0.8910069143863101]]]
   
 t_end_phases = [1,1.5]
+
+mass = 75;  # mass of the robot
+g = 9.81;   # gravity acceleration
+mu = 0.5;   # friction coefficient

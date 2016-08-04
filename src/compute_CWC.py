@@ -21,9 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 NUMBER_TYPE = 'float'  # 'float' or 'fraction'
 
                      
-mass = 75;  # mass of the robot
-g = 9.81;   # gravity acceleration
-mu = 0.5;   # friction coefficient
+
 n = 3;      # generator size
 cg = 4;     # number of generators per contact
 USE_DIAGONAL_GENERATORS = True;
@@ -36,8 +34,11 @@ CONTACT_SET = 1;
 #  \param p array of 3d contact positions
 #  \param N array of 3d contact normals
 #  \return the CWC H, H w <= 0, where w is the wrench
-def compute_CWC(p,N):
+def compute_CWC(p, N, params):
 	''' compute generators '''
+	mass = params["mass"]
+	g = params["g"]
+	mu = params["mu"]
 	c = p.shape[0];
 	#gamma = atan(mu);   # half friction cone angle
 	m = c*cg;            # number of generators
@@ -175,5 +176,5 @@ def compute_CWC(p,N):
 
 
 def test():
-	from test_vars import p, N
-	return compute_CWC(array(p[1]),array(N[1]))
+	from test_vars import p, N, mass, g, mu
+	return compute_CWC(array(p[1]),array(N[1]), {"mass" : mass, "g": g, "mu":mu })

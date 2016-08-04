@@ -32,17 +32,20 @@ def __def_access_param_method(param, keyword, fun):
 #  \param dt: step size
 #  \return a dictionnary param, used throughout the optimization problem to set
 #  up constraints and cost functions
-def init_problem(p, N, c_input, t_end_phases, dt):
+def init_problem(p, N, c_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81):
 	param = {"p"      		: [array(phase) for phase in p], 
 	         "N" 	  		: [array(phase) for phase in N],
 	         "c_init" 		: c_input[0],
 	         "c_end" 		: c_input[1],
 	         "dt" 			: dt,
+	         "mass" 		: mass,
+	         "mu" 			: mu,
+	         "g" 			: g,
 	         #t_phases in updated to each starting phase time and one final phase
 	         "t_init_phases": [0] +[t_end_phases[i] + dt for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
 	         
 	#defining cone method compute all cones on first call, otherwise return hidden variable __cones	
-	def f(phase ): return lambda: compute_CWC(param["p"][phase], param["N"][phase])
+	def f(phase ): return lambda: compute_CWC(param["p"][phase], param["N"][phase], param)
 	param['cones'] = __def_access_param_method(param, "cones", [f(phase) for phase in range(len(p))])
 														  
 	return param
