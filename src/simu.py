@@ -1,8 +1,5 @@
 from scipy.linalg import block_diag 
 from numpy import array, hstack
-
-#~ def __integrate(dest, inp, fun):
-#~ return  [dest.append(fun(dest[-1],u_i)) for u_i in inp]
 	
 __lastcomputed = None
 
@@ -27,9 +24,7 @@ def create_integrate(param):
 		res_l_p = [init_l_p];
 		[res_c_p.append(res_c_p[-1] + dt *u_i                            ) for u_i in u_n                  ];
 		[  res_c.append(res_c  [-1] + dt *0.5*(res_c_p[i] + res_c_p[i-1])) for i   in range(1,len(res_c_p))];
-		#~ __integrate(res_c_p, u_n, lambda x, y: x + dt * y);
-		#~ __integrate(res_c  , res_c_p[1:], lambda x, y: x + dt * y);
-		__lastcomputed = { 'c' : res_c[1:], 'c_d': res_c_p[1:], 'w':  u_n, 'u':  u}
+		__lastcomputed = { 'c' : res_c[1:], 'c_d': res_c_p[1:], 'x' : hstack([res_c[1:],res_c_p[1:]]) , 'w':  u_n, 'u':  u}
 		return __lastcomputed
 	return res_fun
 
@@ -39,7 +34,7 @@ def test_integrate():
 	u = [1,0,0,
 		 1,0,0,
 		 0,0,1]
-	integration = integrate(u)	
+	integration = integrate(u)
 	assert((integration['c'][-1] == array([ 2., 2., 3.125])).all())
-	assert(len(integration['c']) == len(integration['c_d']) == len(integration['w']))
+	assert(len(integration['x']) == len(integration['c']) == len(integration['c_d']) == len(integration['w']))
 	
