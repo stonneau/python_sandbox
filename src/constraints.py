@@ -60,8 +60,6 @@ def __stack_filter_cons(factory, cons_type, var_type, params):
 			return A.dot(var_of_interest) - b
 		return {'type': cons_type, 'fun' : fun}
 		
-__cons_type = ['eq','ineq']
-__var_type = ['w','x']
 
 ## From a user selected set of constraints, initialize the constraints array to pass to a minimization
 #  problem.
@@ -69,12 +67,15 @@ __var_type = ['w','x']
 #  \param params parameter dictionnary obtained from a call to init_problem
 #  \return a dictionnary of constraints to pass to the minimization problem
 def init_constraints(constraints, params):
+	#retrieve all constraints type
+	c_types = ['eq', 'ineq'];
+	v_types = set([]); [v_types.add(__constraint_factory[name]['var' ]) for name in __constraint_factory]	
 	#retrieve all constraints
 	cons = [__constraint_factory[name] for name in constraints]
 	# combine all possible constraint type and variable type => [['eq', 'w'], ['eq', 'x'], ..., ['ineq', 'w'] ...]
 	# and create constraint method for each of those
 	constraint_list = [__stack_filter_cons([c for c in cons if c['type'] == c_type], c_type, v_type, params) 
-								for c_type in  __cons_type for v_type in __var_type]
+								for c_type in  c_types for v_type in v_types]
 	return tuple([c for c in constraint_list if c != None])
 	
 		
