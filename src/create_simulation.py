@@ -7,7 +7,7 @@ __lastcomputed = None
 # computes the state c, dc at each step of the simulation
 #  \param param requires "x_init", and "dt"
 #  \return dictionnary of variables.
-def create_integrate(param):
+def create_simulation(param):
 	init_c   = array(param["x_init"][0:3]) #init position
 	init_dc = array(param["x_init"][3:6]) #init velocity
 	init_dL = array([0,0,0])  #init angular momentum
@@ -45,16 +45,16 @@ def create_integrate(param):
 	return res_fun
 
 
-def test_integrate():
-	integrate = create_integrate({ "x_init" : [1,2,3,0,0,0], "dt" : 0.5, "g" : 10, "mass" : 10})
+def test_create_simulation():
+	simulation = create_simulation({ "x_init" : [1,2,3,0,0,0], "dt" : 0.5, "g" : 10, "mass" : 10})
 	u = [1,0,0, #ddc
 		 1,0,0,
 		 0,0,1,
 		 1,0,0, #dL
 		 1,0,0,
 		 0,0,1]
-	integration = integrate(u)
-	assert((integration['c'][-1] == array([ 2., 2., 3.125])).all())
-	assert(len(integration['x']) == len(integration['c']) == len(integration['dc']) == len(integration['w']))
+	simulation = simulation(u)
+	assert((simulation['c'][-1] == array([ 2., 2., 3.125])).all())
+	assert(len(simulation['x']) == len(simulation['c']) == len(simulation['dc']) == len(simulation['w']))
 	print "test exited normally" 
 		
