@@ -22,9 +22,9 @@ def create_simulation(param):
 			return __lastcomputed
 		# else init variables and integrate forward in time
 		ddc = [array(u[i:i+3]) for i in range(0, len(u)/2, 3)]
-		dL =  [array(u[i:i+3]) for i in range(len(u)/2, len(u), 3)]
-		c  = [init_c]; 
-		dc = [init_dc];		
+		dL 	= [array(u[i:i+3]) for i in range(len(u)/2, len(u), 3)]
+		c  	= [init_c]; 
+		dc 	= [init_dc];		
 		# dc
 		# ambiguity comes from the fact that control vector u has one less entry than the state vector x
 		# euler integration for velocity gives:
@@ -40,7 +40,7 @@ def create_simulation(param):
 		y = [m * (ddc_i - g_vec) for ddc_i in ddc]
 		w = [y[i].tolist() + (cross(c[i], y[i]) + dL[i]).tolist() for i,_ in enumerate(c)]
 		x = [c[i].tolist() + dc[i].tolist() for i,_ in enumerate(c)]
-		__lastcomputed = { 'c' : c, 'dc': c, 'x' : array(x) , 'w':  array(w), 'u':  u}
+		__lastcomputed = { 'c' : c, 'dc': c, 'ddc' : ddc, 'x' : array(x) , 'w':  array(w), 'u':  u, 'dL' : dL}
 		return __lastcomputed
 	return res_fun
 
