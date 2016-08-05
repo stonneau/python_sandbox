@@ -84,7 +84,6 @@ def test_cones_constraint():
 	 'dt' : 0.5,
 	 't_init_phases' : [0,1,4]}
 	A, b = cones_constraint(param)
-	print A
 	assert(b.shape==(16,))
 	assert((b==zeros(16)).all())
 	assert(A.shape == (16,16))
