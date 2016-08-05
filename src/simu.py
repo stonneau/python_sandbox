@@ -42,4 +42,5 @@ def test_integrate():
 	integration = integrate(u)
 	assert((integration['c'][-1] == array([ 2., 2., 3.125])).all())
 	assert(len(integration['x']) == len(integration['c']) == len(integration['c_p']) == len(integration['w']))
+	print "test exited normally" 
 	

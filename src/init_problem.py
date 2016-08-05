@@ -7,6 +7,7 @@ Created on Thurs Aug 4
 
 from compute_CWC import compute_CWC
 from numpy import array
+from simu  import create_integrate
 
 ## optional parameters are only computed if necessary when requested
 def __def_access_param_method(param, keyword, fun):
@@ -47,6 +48,7 @@ def init_problem(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81):
 	#defining cone method compute all cones on first call, otherwise return hidden variable __cones	
 	def f(phase ): return lambda: compute_CWC(param["p"][phase], param["N"][phase], param)
 	param['cones'] = __def_access_param_method(param, "cones", [f(phase) for phase in range(len(p))])
+	param['simulate'] = create_integrate(param)
 														  
 	return param
 	
@@ -60,4 +62,4 @@ def test():
 	assert(len(cones)) == 2
 	assert(cones[0].shape[0]) == 16
 	assert(cones[0].shape[1]) == 6
-	#~ return param
+	print "test exited normally" 
