@@ -33,8 +33,11 @@ CONTACT_SET = 1;
 #  compute the gravito inertial wrench cone
 #  \param p array of 3d contact positions
 #  \param N array of 3d contact normals
+#  \param simplify_cones if true inequality conversion will try to remove 
+#  redundancies
+#  \param params requires "mass" "g"  and "mu"
 #  \return the CWC H, H w <= 0, where w is the wrench
-def compute_CWC(p, N, params):
+def compute_CWC(p, N, simplify_cones, params):
 	''' compute generators '''
 	mass = params["mass"]
 	g = params["g"]
@@ -83,7 +86,7 @@ def compute_CWC(p, N, params):
 	for i in range(c):
 		S_centr[:,cg*i:cg*i+cg] = np.dot(M[:,3*i:3*i+3], S[:,cg*i:cg*i+cg]);
 	''' convert generators to inequalities '''
-	H = cone_span_to_face(S_centr);
+	H = cone_span_to_face(S_centr, simplify_cones);
 
 	return H
 	
@@ -177,4 +180,4 @@ def compute_CWC(p, N, params):
 
 def test():
 	from test_vars import p, N, mass, g, mu
-	return compute_CWC(array(p[1]),array(N[1]), {"mass" : mass, "g": g, "mu":mu })
+	return compute_CWC(array(p[1]),array(N[1]), True, {"mass" : mass, "g": g, "mu":mu })
