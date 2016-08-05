@@ -22,11 +22,11 @@ def create_integrate(param):
 		res_c   = [init_c]; 
 		res_c_p = [init_c_p];
 		res_l_p = [init_l_p];
-		# ambiguity comes from the fact that control vector u has one less entry than the state vector x 
+		# ambiguity comes from the fact that control vector u has one less entry than the state vector x
 		# euler integration for velocity gives:
 		# c_p[i+1] = c_pp[i+1] *dt + c_p[i].
 		# but is effectively implemented as c_p[i+1] = c_pp[i] *dt + c_p[i] since c_pp is offset
-		[res_c_p.append(res_c_p[-1] + dt *u_i                            ) for u_i in u_n                  ];
+		[res_c_p.append(res_c_p[-1] + dt *u_i[0:3]                       ) for u_i in u_n                  ];
 		# c[i+1] = 1/2 (c_p[i+1] + c_p[i]) *dt + c_p[i].
 		[  res_c.append(res_c  [-1] + dt *0.5*(res_c_p[i] + res_c_p[i-1])) for i   in range(1,len(res_c_p))];
 		__lastcomputed = { 'c' : res_c[1:], 'c_p': res_c_p[1:], 'x' : hstack([res_c[1:],res_c_p[1:]]) , 'w':  u_n, 'u':  u}
