@@ -79,7 +79,7 @@ def init_constraints(constraints, params):
 	
 		
 def test_cones_constraint():
-	param = {'cones' : lambda : [[[1,2],[3,4]],[[5,6],[7,8]]],
+	param = {'cones' : lambda : [array([[1,2],[3,4]]),array([[5,6],[7,8]])],
 	 'dt' : 0.5,
 	 't_init_phases' : [0,1,4]}
 	A, b = cones_constraint(param)
@@ -108,7 +108,7 @@ def test_end_reached_constraint():
 	
 
 def test_init_constraints():
-	params = {'cones' : lambda : [[[1,1,1,1,1,1],[1,1,1,1,1,1]],[[1,1,1,1,1,1],[1,1,1,1,1,1]]],
+	params = {'cones' : lambda : [array([[1,1,1,1,1,1],[1,1,1,1,1,1]]) for _ in range(2)],
 	 'dt' : 0.5,
 	 't_init_phases' : [0,1.5],
 	 "x_end" : [1,2,3,4,5,6],
