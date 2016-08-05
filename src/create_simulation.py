@@ -8,6 +8,7 @@ __lastcomputed = None
 #  \param param requires "x_init", and "dt"
 #  \return dictionnary of variables.
 def create_simulation(param):
+	print param["x_init"]
 	init_c   = array(param["x_init"][0:3]) #init position
 	init_dc = array(param["x_init"][3:6]) #init velocity
 	init_dL = array([0,0,0])  #init angular momentum
