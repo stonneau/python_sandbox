@@ -39,12 +39,19 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 n = 100
 points = var_final['x']
-for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
-    xs = [points[i] for i in range(0,len(points),6)]
-    ys = [points[i] for i in range(1,len(points),6)]
-    zs = [points[i] for i in range(2,len(points),6)]
-    ax.scatter(xs, ys, zs, c=c, marker=m)
+xs = [points[i] for i in range(0,len(points),6)]
+ys = [points[i] for i in range(1,len(points),6)]
+zs = [points[i] for i in range(2,len(points),6)]
+ax.scatter(xs, ys, zs, c='b')
 
+colors = ["r", "b", "g"]
+#print contact points of first phase
+for id_c, points in enumerate(p_3):
+	xs = [point[0] for point in points]
+	ys = [point[1] for point in points]
+	zs = [point[2] for point in points]
+	ax.scatter(xs, ys, zs, c=colors[id_c])
+	
 ax.set_xlabel('X Label')
 ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')
