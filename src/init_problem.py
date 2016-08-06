@@ -43,7 +43,8 @@ def init_problem(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81, 
 	         "mu" 			: mu,
 	         "g" 			: g,
 	         #t_phases in updated to each starting phase time and one final phase
-	         "t_init_phases": [0] +[t_end_phases[i] + dt for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
+	         #~ "t_init_phases": [dt] +[t_end_phases[i] + dt for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
+	         "t_init_phases": [0] + [t_end_phases[i] for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
 	         
 	#defining cone method compute all cones on first call, otherwise return hidden variable __cones	
 	def f(phase ): return lambda: compute_CWC(param["p"][phase], param["N"][phase], simplify_cones, param)

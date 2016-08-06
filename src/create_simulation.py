@@ -17,9 +17,9 @@ def create_simulation(param):
 	# u is the control [ddc[0],...,ddc[n],L_p[0],L_p[n]]
 	def res_fun(u):
 		# return computed variables if already done at this step
-		global __lastcomputed
-		if __lastcomputed != None and ((__lastcomputed['u'] == u).all()):
-			return __lastcomputed
+		#~ global __lastcomputed
+		#~ if __lastcomputed != None and ((__lastcomputed['u'] == u).all()):
+			#~ return __lastcomputed
 		# else init variables and integrate forward in time
 		ddc = [array(u[i:i+3]) for i in range(0, len(u)/2, 3)]
 		dL 	= [array(u[i:i+3]) for i in range(len(u)/2, len(u), 3)]
