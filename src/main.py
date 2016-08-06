@@ -21,9 +21,20 @@ def cone_optimization(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9
 	return minimize(objective, init_guess, constraints=cons, method='SLSQP', options={'disp': True}), params
 
 
-#~ def test():
 from test_vars import *
+
+#~ def test():
+print len(p_hyq)
+print len(N_hyq)
+
 res, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, mu, mass, g)
+#~ p = [[p_hyq_j[i] for i in range(0,len(p_hyq_j),4)] for p_hyq_j in p_hyq]
+#~ N = [[N_hyq_j[i] for i in range(0,len(N_hyq_j),4)] for N_hyq_j in N_hyq]
+#~ print N
+#~ print len(N[0])
+#~ print len(N_hyq[0])
+#~ res, params = cone_optimization(p, N, [x_init_hyq, x_end_hyq], t_end_phases_3, dt, mu_hyq, mass, g)
+
 
 var_final = params['simulate'](res['x'])
 
@@ -33,7 +44,7 @@ import matplotlib.pyplot as plt
 
 
 def randrange(n, vmin, vmax):
-    return (vmax - vmin)*np.random.rand(n) + vmin
+	return (vmax - vmin)*np.random.rand(n) + vmin
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')

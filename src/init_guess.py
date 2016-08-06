@@ -56,7 +56,7 @@ def test_initial_guess_naive():
 	assert(len(res)==24)
 
 	sim =create_simulation(params)
-	res = sim(res)['x']
+	res = sim(res)['c']
 	assert( (res[3][0:3]==array([1,0,1])).all() )
 	print "test_initial_guess_naive exited normally" 
 		  
