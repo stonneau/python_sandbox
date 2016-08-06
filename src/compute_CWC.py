@@ -38,6 +38,7 @@ CONTACT_SET = 1;
 #  \param params requires "mass" "g"  and "mu"
 #  \return the CWC H, H w <= 0, where w is the wrench
 def compute_CWC(p, N, simplify_cones, params):
+	#~ print "CWC"
 	''' compute generators '''
 	mass = params["mass"]
 	g = params["g"]
@@ -88,6 +89,7 @@ def compute_CWC(p, N, simplify_cones, params):
 	''' convert generators to inequalities '''
 	H = cone_span_to_face(S_centr, simplify_cones);
 
+	#~ print "CWC_END"
 	return H
 	
 	#~ ''' project inequalities from 6d to 3d com space '''
@@ -178,6 +180,3 @@ def compute_CWC(p, N, simplify_cones, params):
 	#~ plt.show();
 
 
-def test():
-	from test_vars import p, N, mass, g, mu
-	return compute_CWC(array(p[1]),array(N[1]), True, {"mass" : mass, "g": g, "mu":mu })

@@ -41,22 +41,3 @@ def initial_guess_naive(params):
  	# now add 0 dL
  	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1],dt)]
  	
-
-
-def test_initial_guess_naive():
-	from create_simulation import create_simulation
-	params = { 'dt'          : 0.5,
-			  't_init_phases': [0,1,2],
-			  'x_init'       : [0,0,0,0,0,0],
-			  'x_end'        : [1,0,1,0,0,0],
-			  'g' 			 : 10,
-			  'mass' 		 : 10 }
-	  
-	res = initial_guess_naive(params)
-	assert(len(res)==24)
-
-	sim =create_simulation(params)
-	res = sim(res)['c']
-	assert( (res[3][0:3]==array([1,0,1])).all() )
-	print "test_initial_guess_naive exited normally" 
-		  

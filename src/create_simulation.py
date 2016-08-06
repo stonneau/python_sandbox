@@ -45,17 +45,4 @@ def create_simulation(param):
 	return res_fun
 
 
-def test_create_simulation():
-	simulation = create_simulation({ "x_init" : [1,2,3,0,0,0], "dt" : 0.5, "g" : 10, "mass" : 10})
-	u = array([1,0,0, #ddc
-		 1,0,0,
-		 0,0,1,
-		 1,0,0, #dL
-		 1,0,0,
-		 0,0,1])
-	simulation = simulation(u)
-	assert((simulation['c'][-1] == array([ 2., 2., 3.125])).all())
-	assert(len(simulation['x']) == len(simulation['w']))
-	assert(len(simulation['c']) == len(simulation['dc']) == len(simulation['ddc'])  == len(simulation['dL']))
-	print "test exited normally" 
 		

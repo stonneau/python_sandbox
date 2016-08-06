@@ -50,30 +50,3 @@ def init_objective(objective, params):
 		return reduce(lambda a, b :a + b, [cost(variables) for cost in cost_functions])
 	return objective_fun
 	
-def test_init_objective():
-	variables = {'dL' : [array([1,0,0]) for _ in range(4)], 
-				 'ddc': [array([0.5,0,0]) for i in range (4)], 
-				 'x'  :  array([ [0 for _ in range (6)] for _ in range(4)])}
-
-	params = {'x_end' : [i for i in range(6)], 'simulate' : lambda(_): variables}
-	# test each cost individually
-	objective = init_objective([["min_dL", 1]], params)
-	assert(objective(variables)==4.)
-
-	objective = init_objective([["min_dL", 0.5]], params)
-	assert(objective(variables)==2.)
-
-	objective = init_objective([["min_ddc", 1]], params)
-	assert(objective(variables)==2.)
-
-	objective = init_objective([["min_ddc", 2]], params)
-	assert(objective(variables)==4.)
-
-	objective = init_objective([["end_reached", 1]], params)
-	assert(objective(variables)==norm(array(params['x_end'])))
-
-	objective = init_objective([["end_reached", 2]], params)
-	assert(objective(variables)==2*norm(array(params['x_end'])))
-
-	objective = init_objective([["min_dL", 0.5],["min_ddc", 2],["end_reached", 1]], params)
-	assert(objective(variables)==2 + 4 + norm(array(params['x_end'])))

@@ -52,15 +52,3 @@ def init_problem(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81, 
 	param['simulate'] = create_simulation(param)
 														  
 	return param
-	
-def test():
-	from test_vars import p, N, t_end_phases
-	param =  init_problem(p, N, ["com_s", "com_g"], t_end_phases,0.1)
-#check phases
-	assert(param["t_init_phases"]) == [0, 1.1, 1.5]
-#check cones
-	cones = param["cones"]()
-	assert(len(cones)) == 2
-	assert(cones[0].shape[0]) == 16
-	assert(cones[0].shape[1]) == 6
-	print "test exited normally" 
