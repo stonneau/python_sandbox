@@ -28,8 +28,8 @@ def min_ddc(param, weight):
 #  \param param requires "c_end", "t_init_phases"
 #  \return 
 def end_reached(param, weight):
-	x_end  = array(param["x_end"])
-	return lambda variables : weight * norm(variables["x"][-1] - x_end)
+	x_end  = array(param["x_end"][0:3])
+	return lambda variables : weight * norm(variables["c"][-1] - x_end)
 	
 __objective_factory = { 
 	'min_dL' : min_dL,
