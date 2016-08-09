@@ -30,10 +30,12 @@ def __def_access_param_method(param, keyword, fun):
 #  \param x_input: list of exactly two 6D vectors, indicating start and end positions and velocities of the com 
 #  \param t_phases list of ending times for each contact phases. For instance if first phase last 1 second, and 
 #  second lasts 0.5 second, t_phases=[1,1.5] 
+#  \param cones: None by default. If cones is a list of cones, they will be used
+#   as CWC, instead of computing them
 #  \param dt: step size
 #  \return a dictionnary param, used throughout the optimization problem to set
 #  up constraints and cost functions
-def init_problem(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81, simplify_cones = True):
+def init_problem(p, N, x_input, t_end_phases, dt, cones = None, mu =0.5, mass = 75, g = 9.81, simplify_cones = True):
 	param = {"p"      		: [array(phase) for phase in p], 
 	         "N" 	  		: [array(phase) for phase in N],
 	         "x_init" 		: x_input[0],
@@ -47,8 +49,13 @@ def init_problem(p, N, x_input, t_end_phases, dt, mu =0.5, mass = 75, g = 9.81, 
 	         "t_init_phases": [0] + [t_end_phases[i] for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
 	         
 	#defining cone method compute all cones on first call, otherwise return hidden variable __cones	
-	def f(phase ): return lambda: compute_CWC(param["p"][phase], param["N"][phase], simplify_cones, param)
-	param['cones'] = __def_access_param_method(param, "cones", [f(phase) for phase in range(len(p))])
+	if cones == None:
+		def f(phase ): return lambda: compute_CWC(param["p"][phase], param["N"][phase], simplify_cones, param)
+		param['cones'] = __def_access_param_method(param, "cones", [f(phase) for phase in range(len(p))])
+	else:
+		assert(len(cones)==len(p))
+		def f(phase ): return lambda: cones[phase]
+		param['cones'] = __def_access_param_method(param, "cones", [f(phase) for phase in range(len(p))])
 	param['simulate'] = create_simulation(param)
 														  
 	return param

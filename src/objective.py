@@ -6,10 +6,10 @@ from numpy import array, arange, zeros, ones, identity, vstack, hstack, append, 
 # user-defined weights.
 # the factory automatically builds the cost function
 # and returns it
-
+	
 
 def __sum_over(var_name, weight):
-	return lambda variables: weight * norm(reduce(lambda a, b :a + b, variables[var_name]))
+	return lambda variables: weight * reduce(lambda a, b :a + b, [ norm(s) for s in variables[var_name] ])
 
 ## ("dL")
 #  Minimize angular momentum variation
@@ -29,7 +29,8 @@ def min_ddc(param, weight):
 #  \return 
 def end_reached(param, weight):
 	x_end  = array(param["x_end"][0:3])
-	return lambda variables : weight * norm(variables["c"][-1] - x_end)
+	v_end  = array(param["x_end"][3:6])
+	return lambda variables : weight * (norm(variables["c"][-1] - x_end) + 0.5 * norm(variables["dc"][-1] - v_end))
 	
 __objective_factory = { 
 	'min_dL' : min_dL,
