@@ -35,7 +35,7 @@ def __def_access_param_method(param, keyword, fun):
 #  \param dt: step size
 #  \return a dictionnary param, used throughout the optimization problem to set
 #  up constraints and cost functions
-def init_problem(p, N, x_input, t_end_phases, dt, cones = None, mu =0.5, mass = 75, g = 9.81, simplify_cones = True):
+def init_problem(p, N, x_input, t_end_phases, dt, cones = None, COMConstraints = None, mu =0.5, mass = 75, g = 9.81, simplify_cones = True):
 	param = {"p"      		: [array(phase) for phase in p], 
 	         "N" 	  		: [array(phase) for phase in N],
 	         "x_init" 		: x_input[0],
@@ -44,6 +44,7 @@ def init_problem(p, N, x_input, t_end_phases, dt, cones = None, mu =0.5, mass = 
 	         "mass" 		: mass,
 	         "mu" 			: mu,
 	         "g" 			: g,
+	         "COMCons" 		: COMConstraints,
 	         #t_phases in updated to each starting phase time and one final phase
 	         #~ "t_init_phases": [dt] +[t_end_phases[i] + dt for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
 	         "t_init_phases": [0] + [t_end_phases[i] for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }

@@ -80,6 +80,22 @@ def test_cones_constraint():
 		assert A[i+1][i] == 7
 		assert A[i+1][i+1] == 8
 	print "test exited normally" 
+	
+#~ *****************************
+#~ *  constraints
+#~ *****************************
+def test_com_kinematic_constraint():
+	param = {'COMCons' : [[identity(3),array([0,0,0])],[identity(3), array([0,0,1])]],
+	 'dt' : 0.5,
+	 't_init_phases' : [0,1,4]}
+	A, b = com_kinematic_constraint(param)
+	assert(b.shape==(24,))
+	assert(A.shape == (24,24))
+	test = zeros(24); test[8]=1;
+	assert((A.dot(test) - b) <= 0).all()
+	test[9] = 1 
+	assert(not((A.dot(test) - b) <= 0).all())
+	print "test exited normally" 
 		
 def test_end_reached_constraint():
 	param = {'dt' : 0.5, "x_end" : [1,2,3,4,5,6], 't_init_phases' : [0,1.5]}
@@ -88,6 +104,15 @@ def test_end_reached_constraint():
 	assert(((A.dot(test_vec) - b) == zeros(18)).all())
 	print "test exited normally" 
 	
+def test_end_reached_minus_plus_constraint():
+	param = {'dt' : 0.5, "x_end" : [1,2,3,4,5,6], 't_init_phases' : [0,1.5]}
+	A, b = end_reached_constraint_minus(param)
+	A2, b2 = end_reached_constraint_plus(param)
+	test_vec = append(zeros(12),param["x_end"])
+	assert(((A.dot(test_vec) - b) <= zeros(18)).all())
+	assert(((A2.dot(test_vec) - b2) <= zeros(18)).all())
+	print "test exited normally" 
+
 
 def test_init_constraints():
 	params = {'cones' : lambda : [array([[1,1,1,1,1,1],[1,1,1,1,1,1]]) for _ in range(2)],
@@ -132,7 +157,9 @@ def test_initial_guess_naive():
 def test_init_objective():
 	variables = {'dL' : [array([1,0,0]) for _ in range(4)], 
 				 'ddc': [array([0.5,0,0]) for i in range (4)], 
-				 'x'  :  array([ [0 for _ in range (6)] for _ in range(4)])}
+				 'x'  :  array([ [0 for _ in range (6)] for _ in range(4)]),
+				 'c'  :  array([ [0 for _ in range (3)] for _ in range(4)]),
+				 'dc' :  array([ [0 for _ in range (3)] for _ in range(4)])}
 
 	params = {'x_end' : [i for i in range(6)], 'simulate' : lambda(_): variables}
 	# test each cost individually
@@ -149,13 +176,13 @@ def test_init_objective():
 	assert(objective(variables)==4.)
 
 	objective = init_objective([["end_reached", 1]], params)
-	assert(objective(variables)==norm(array(params['x_end'])))
+	assert(objective(variables)==norm(array(params['x_end'][0:3])) + 0.5 * norm(array(params['x_end'][3:6])))
 
 	objective = init_objective([["end_reached", 2]], params)
-	assert(objective(variables)==2*norm(array(params['x_end'])))
+	assert(objective(variables)==2* (norm(array(params['x_end'][0:3])) + 0.5 * norm(array(params['x_end'][3:6]))))
 
 	objective = init_objective([["min_dL", 0.5],["min_ddc", 2],["end_reached", 1]], params)
-	assert(objective(variables)==2 + 4 + norm(array(params['x_end'])))
+	assert(objective(variables)==2 + 4 + norm(array(params['x_end'][0:3])) + 0.5 * norm(array(params['x_end'][3:6])))
 
 #~ *****************************
 #~ *  integration test
@@ -211,10 +238,14 @@ tests_run = {
 	'test_init_constraints' : test_init_constraints,
 	'test_initial_guess_naive' : test_initial_guess_naive,
 	'test_init_objective' : test_init_objective,
-	'test_optimize' : test_optimize
+	#~ 'test_optimize' : test_optimize,
+	'test_end_reached_minus_plus_constraint' : test_end_reached_minus_plus_constraint,
+	'test_com_kinematic_constraint' : test_com_kinematic_constraint
 }
 
 def run_tests():
 	for name, fun in tests_run.iteritems():
 		print "running tests: " + name
-		fun()
+		fun()		
+		
+run_tests()

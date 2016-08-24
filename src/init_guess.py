@@ -17,6 +17,7 @@ def normalize(v):
        return v
     return v/n
 
+
 ## really naive initial guess
 # straight line from start to goal
 # accelerate constantly half the way, then decelerate constantly 
@@ -41,3 +42,46 @@ def initial_guess_naive(params):
  	# now add 0 dL
  	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1],dt)]
  	
+## initial guess
+# which tries to compute two straight lines, with one middle
+# point in the middle cone.
+# accelerate constantly half the way, then decelerate constantly 
+# by the same amount. For this solve for ddc such that
+# at half time, the robot is mid-way.
+# angular momentum variation set to 0 all along
+# assume velocities at start and goal are zeros
+# assume velocities at start and goal are zeros
+# \param requires x_init, x_end, dt and t_init_phases
+# \return velocities at start and goal are zeros
+def initial_guess_naive_noise(params):
+	phases = params["t_init_phases"]; x_init = params["x_init"];
+	x_end  = params["x_end"]; dt = params["dt"];
+	c_0 = array(x_init[0:3]); c_end = array(x_end[0:3])
+	c_mid_min_c0 = (c_end - c_0) / 2.; # mid-point
+	t_mid = phases[-1]/2. + 4 * dt; # mid-time
+ 	ddc = 2*(c_mid_min_c0 / t_mid**2); 
+ 	#now find closest x*dt < t_mid, with x integer
+ 	t_mid = floor(t_mid /dt)*dt
+ 	#now just apply it for half the time, then negatively the rest
+ 	acc = [el for _ in arange(0,t_mid,dt) for el in ddc] + [-el for _ in arange(t_mid,phases[-1],dt) for el in ddc ]
+ 	# now add 0 dL
+ 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1],dt)]
+ 	
+## initial guess
+# that simply compensates for the gravity
+# at half time, the robot is mid-way.
+# angular momentum variation set to 0 all along
+# assume velocities at start and goal are zeros
+# assume velocities at start and goal are zeros
+# \param requires x_init, x_end, dt and t_init_phases
+# \return velocities at start and goal are zeros
+def initial_guess_naive_gravity_compensation(params):
+	#compute naive initial guess
+	#~ naive_guess = initial_guess_naive(params)
+	gdt = params["dt"] * params["g"];
+	phases = params["t_init_phases"];
+	ddc = [0,0,gdt]
+	return [el for _ in arange(0,phases[-1],dt) for el in ddc]
+	#~ for i in arange(0,phases[-1],dt):
+		#~ naive_guess[3*i+2] = naive_guess[3*i+2] + gdt
+	#~ return naive_guess

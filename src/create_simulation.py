@@ -1,5 +1,5 @@
 from scipy.linalg import block_diag 
-from numpy import array, hstack, cross
+from numpy import array, hstack, cross, arange
 	
 __lastcomputed = None
 
