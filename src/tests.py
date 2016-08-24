@@ -192,7 +192,7 @@ def test_optimize():
 	#~ print len(p_hyq)
 	#~ print len(N_hyq)
 
-	var_final, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, mu, mass, g)
+	var_final, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, None, None, mu, mass, g)
 	#~ var_final, params = cone_optimization(p, N, [x_init, x_end], t_end_phases, dt, mu, mass, g)
 	#~ p = [[p_hyq_j[i] for i in range(0,len(p_hyq_j),4)] for p_hyq_j in p_hyq]
 	#~ N = [[N_hyq_j[i] for i in range(0,len(N_hyq_j),4)] for N_hyq_j in N_hyq]
@@ -238,7 +238,7 @@ tests_run = {
 	'test_init_constraints' : test_init_constraints,
 	'test_initial_guess_naive' : test_initial_guess_naive,
 	'test_init_objective' : test_init_objective,
-	#~ 'test_optimize' : test_optimize,
+	'test_optimize' : test_optimize,
 	'test_end_reached_minus_plus_constraint' : test_end_reached_minus_plus_constraint,
 	'test_com_kinematic_constraint' : test_com_kinematic_constraint
 }
