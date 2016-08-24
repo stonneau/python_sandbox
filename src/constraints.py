@@ -38,10 +38,18 @@ def com_kinematic_constraint(param):
 	comCons  = param["COMCons"]
 	if(comCons == None):
 		print "Error: com_kinematic_constraint activated but no constraints given "
+	consA = []; consb = [];
+	for _, c in enumerate(comCons):
+		A = c[0]; b = c[1]
+		a = zeros([A.shape[0],A.shape[1]+3])
+		a [:,:-3] = A
+		consA.append(a)
+		consb.append(b)
+		
 	phases = param["t_init_phases"]
 	dt = param["dt"]
-	A = block_diag(*[comCons[index][0] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
-	b = hstack([comCons[index][1] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
+	A = block_diag(*[consA[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
+	b = hstack([consb[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
 	return A, b 
 	
 #~ ## ("eq","x")
@@ -103,7 +111,7 @@ __constraint_factory = {
 	'end_reached_constraint_plus'		: {'type': 'ineq', 'var' : 'x', 'fun': end_reached_constraint_plus},
 	'end_reached_constraint_minus'		: {'type': 'ineq', 'var' : 'x', 'fun': end_reached_constraint_minus},
 	'cones_constraint' 		        	: {'type': 'ineq', 'var' : 'w', 'fun': cones_constraint},
-	'com_kinematic_constraint' 		   	: {'type': 'ineq', 'var' : 'c', 'fun': com_kinematic_constraint},
+	'com_kinematic_constraint' 		   	: {'type': 'ineq', 'var' : 'x', 'fun': com_kinematic_constraint},
 	'end_null_acceleration_constraint'  : {'type': 'eq'  , 'var' : 'w', 'fun': end_null_acceleration_constraint}}
 
 def __filter_cons(factory, cond_name, cond_value):
@@ -116,7 +124,7 @@ def __stack_filter_cons(factory, cons_type, var_type, params):
 	if mat_and_vector:
 		# stack matrices
 		A = vstack([c[0] for c in mat_and_vector])
-		b = array([c[1] for c in mat_and_vector]).flatten()
+		b = array([el for els in mat_and_vector for el in els[1] ])
 		def fun(var):
 			var_of_interest = params['simulate'](var)[var_type]
 			return A.dot(var_of_interest) - b
