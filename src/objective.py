@@ -8,8 +8,8 @@ from numpy import array, arange, zeros, ones, identity, vstack, hstack, append, 
 # and returns it
 
 def __normsquared(v):
-	return norm(v)
-	#~ return square(norm(v))
+	#~ return norm(v)
+	return square(norm(v))
 
 def __sum_over(var_name, weight):
 	return lambda variables: weight * reduce(lambda a, b :a + b, [ __normsquared(s) for s in variables[var_name] ])
