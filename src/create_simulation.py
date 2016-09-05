@@ -40,7 +40,7 @@ def create_simulation(param):
 		y = [m * (ddc_i - g_vec) for ddc_i in ddc]
 		w = [y[i].tolist() + (cross(c[i], y[i]) + dL[i]).tolist() for i,_ in enumerate(c)]
 		x = [c[i].tolist() + dc[i].tolist() for i,_ in enumerate(c)]
-		__lastcomputed = { 'c' : c, 'c_end' : c[-1], 'dc': c, 'ddc' : ddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL}
+		__lastcomputed = { 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': c, 'ddc' : ddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL}
 		return __lastcomputed
 	return res_fun
 

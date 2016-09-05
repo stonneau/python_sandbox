@@ -103,16 +103,6 @@ def test_end_reached_constraint():
 	test_vec = append(zeros(12),param["x_end"])
 	assert(((A.dot(test_vec) - b) == zeros(18)).all())
 	print "test exited normally" 
-	
-def test_end_reached_minus_plus_constraint():
-	param = {'dt' : 0.5, "x_end" : [1,2,3,4,5,6], 't_init_phases' : [0,1.5]}
-	A, b = end_reached_constraint_minus(param)
-	A2, b2 = end_reached_constraint_plus(param)
-	test_vec = append(zeros(12),param["x_end"])
-	assert(((A.dot(test_vec) - b) <= zeros(18)).all())
-	assert(((A2.dot(test_vec) - b2) <= zeros(18)).all())
-	print "test exited normally" 
-
 
 def test_init_constraints():
 	params = {'cones' : lambda : [array([[1,1,1,1,1,1],[1,1,1,1,1,1]]) for _ in range(2)],

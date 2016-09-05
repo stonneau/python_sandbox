@@ -58,13 +58,28 @@ def com_kinematic_constraint(param):
 #~ #  \return 
 def end_reached_constraint(param):
 	x_end  = param["x_end"]
-	x_size = len(x_end)
-	phases = param["t_init_phases"]
-	dt = param["dt"]
+	#~ x_size = len(x_end)
+	#~ phases = param["t_init_phases"]
+	#~ dt = param["dt"]
 	#~ zero_matrix = zeros((x_size,x_size))
 	#~ A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [identity(x_size)])
 	A = identity(3)	
 	b = x_end[0:3]
+	return A, b
+	
+#~ ## ("eq","dc_end")
+#~ #  constrains end com position and velocities to be equal to x_end
+#~ #  \param param requires "c_end", "t_init_phases"
+#~ #  \return 
+def end_speed_constraint(param):
+	x_end  = param["x_end"]
+	#~ x_size = len(x_end)
+	#~ phases = param["t_init_phases"]
+	#~ dt = param["dt"]
+	#~ zero_matrix = zeros((x_size,x_size))
+	#~ A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [identity(x_size)])
+	A = identity(3)	
+	b = x_end[3:6]
 	return A, b
 	
 #~ ## ("eq","w")
@@ -86,40 +101,11 @@ def __make_id_half(x_size):
 	for i in range(x_size / 2, x_size):
 		res[i,i] = 0
 	return res
-	
-## ("ineq","x")
-#  constrains end com position and velocities to be almost equal to x_end
-#  \param param requires "c_end", "t_init_phases"
-#  \return 
-def end_reached_constraint_plus(param):
-	epsilon = 0.00000001
-	x_end  = (array(param["x_end"]) + epsilon).tolist()
-	x_size = len(x_end)
-	phases = param["t_init_phases"]
-	dt = param["dt"]
-	zero_matrix = zeros((x_size,x_size))
-	A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [__make_id_half(x_size)])	
-	b = append([zeros(A.shape[0]-x_size)], [x_end])
-	return A, b
-	
-def end_reached_constraint_minus(param):
-	epsilon = 0.00000001
-	x_end  = (epsilon -array(param["x_end"])).tolist()
-	x_size = len(x_end)
-	for i in range(x_size /2, x_size):
-		x_end[i] = 0
-	phases = param["t_init_phases"]
-	dt = param["dt"]
-	zero_matrix = zeros((x_size,x_size))
-	A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [-__make_id_half(x_size)])	
-	b = append([zeros(A.shape[0]-x_size)], [x_end])
-	return A, b	
+
 
 __constraint_factory = { 
-	#~ 'end_reached_constraint'			: {'type': 'eq'  , 'var' : 'x', 'fun': end_reached_constraint},
 	'end_reached_constraint'			: {'type': 'eq'  , 'var' : 'c_end', 'fun': end_reached_constraint},
-	'end_reached_constraint_plus'		: {'type': 'ineq', 'var' : 'x', 'fun': end_reached_constraint_plus},
-	'end_reached_constraint_minus'		: {'type': 'ineq', 'var' : 'x', 'fun': end_reached_constraint_minus},
+	'end_speed_constraint'				: {'type': 'eq'  , 'var' : 'dc_end', 'fun': end_speed_constraint},
 	'cones_constraint' 		        	: {'type': 'ineq', 'var' : 'w', 'fun': cones_constraint},
 	'com_kinematic_constraint' 		   	: {'type': 'ineq', 'var' : 'x', 'fun': com_kinematic_constraint},
 	'end_null_acceleration_constraint'  : {'type': 'eq'  , 'var' : 'w', 'fun': end_null_acceleration_constraint}}
