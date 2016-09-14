@@ -5,7 +5,7 @@ Created on Thurs Aug 5
 @author: stonneau
 """
 
-
+__EPS = 1e-6
 
 from numpy import array, arange, zeros, identity
 from numpy.linalg import norm
@@ -38,9 +38,9 @@ def initial_guess_naive(params):
  	#now find closest x*dt < t_mid, with x integer
  	t_mid = floor(t_mid /dt)*dt
  	#now just apply it for half the time, then negatively the rest
- 	acc = [el for _ in arange(0,t_mid,dt) for el in ddc] + [-el for _ in arange(t_mid,phases[-1],dt) for el in ddc ]
+ 	acc = [el for _ in arange(0,t_mid,dt) for el in ddc] + [-el for _ in arange(t_mid,phases[-1]-__EPS,dt) for el in ddc ]
  	# now add 0 dL
- 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1],dt)]
+ 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)]
  	
 def __barycenter(points):
 	x = zeros(3)
@@ -75,7 +75,7 @@ def initial_guess_support(params):
  	#now just apply it for half the time, then negatively the rest
  	acc = [el for _ in arange(0,t_mid,dt) for el in ddc1] + [-el for _ in arange(t_mid,phases[-1],dt) for el in ddc2 ]
  	# now add 0 dL
- 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1],dt)]
+ 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)]
  	
 ## initial guess
 # which tries to compute two straight lines, with one middle
@@ -98,9 +98,9 @@ def initial_guess_naive_noise(params):
  	#now find closest x*dt < t_mid, with x integer
  	t_mid = floor(t_mid /dt)*dt
  	#now just apply it for half the time, then negatively the rest
- 	acc = [el for _ in arange(0,t_mid,dt) for el in ddc] + [-el for _ in arange(t_mid,phases[-1],dt) for el in ddc ]
+ 	acc = [el for _ in arange(0,t_mid,dt) for el in ddc] + [-el for _ in arange(t_mid,phases[-1]-__EPS,dt) for el in ddc ]
  	# now add 0 dL
- 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1],dt)]
+ 	return acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)]
  	
 ## initial guess
 # that simply compensates for the gravity
@@ -116,7 +116,7 @@ def initial_guess_naive_gravity_compensation(params):
 	gdt = params["dt"] * params["g"];
 	phases = params["t_init_phases"];
 	ddc = [0,0,gdt]
-	return [el for _ in arange(0,phases[-1],dt) for el in ddc]
+	return [el for _ in arange(0,phases[-1]-__EPS,dt) for el in ddc]
 	#~ for i in arange(0,phases[-1],dt):
 		#~ naive_guess[3*i+2] = naive_guess[3*i+2] + gdt
 	#~ return naive_guess

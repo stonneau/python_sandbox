@@ -1,6 +1,8 @@
 from scipy.linalg import block_diag 
 from numpy import array, arange, zeros, ones, identity, vstack, hstack, append
 
+__EPS = 1e-6
+
 ## constraint can be of kind equality ("eq"),
 # inequality ("ineq"). 
 # They can apply to either the control ("u")
@@ -22,7 +24,7 @@ def cones_constraint(param):
 	cones  = param["cones"]()	
 	phases = param["t_init_phases"]
 	dt = param["dt"]
-	A = block_diag(*[cones[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
+	A = block_diag(*[cones[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
 	b = zeros(A.shape[0])
 	return A, b 
 	
@@ -48,8 +50,8 @@ def com_kinematic_constraint(param):
 		
 	phases = param["t_init_phases"]
 	dt = param["dt"]
-	A = block_diag(*[consA[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
-	b = hstack([consb[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1],dt))])
+	A = block_diag(*[consA[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
+	b = hstack([consb[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
 	return A, b 
 	
 #~ ## ("eq","c_end")
@@ -92,7 +94,7 @@ def end_null_acceleration_constraint(param):
 	dt = param["dt"]
 	x_end = zeros((x_size))
 	zero_matrix = zeros((x_size,x_size))
-	A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [identity(x_size)])	
+	A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt-__EPS,dt))] + [identity(x_size)])	
 	b = append([zeros(A.shape[0]-x_size)], [x_end])
 	return A, b
 	

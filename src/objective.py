@@ -1,6 +1,8 @@
 from scipy.linalg import block_diag, norm
 from numpy import array, arange, zeros, ones, identity, vstack, hstack, append, sqrt, square
 
+__EPS = 1e-6
+
 ## objective is  similar to constraint.
 # costs functions are chosen from a objective factory, with
 # user-defined weights.
@@ -43,7 +45,7 @@ def line(params, weight):
 	#director vector is scaled such that last dt equals to xend
 	t_max =  params["t_init_phases"][-1]; dt = params["dt"]
 	v_dir = v_dir /	t_max
-	line_points = [x_init + v_dir * t_i for t_i in arange(dt, t_max + dt, dt)]
+	line_points = [x_init + v_dir * t_i for t_i in arange(dt, t_max + dt-__EPS, dt)]
 	#line between start and end point
 	return __line(line_points, weight)
 	
