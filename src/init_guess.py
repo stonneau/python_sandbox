@@ -5,7 +5,7 @@ Created on Thurs Aug 5
 @author: stonneau
 """
 
-__EPS = 1e-6
+from definitions import __EPS
 
 from numpy import array, arange, zeros, identity
 from numpy.linalg import norm

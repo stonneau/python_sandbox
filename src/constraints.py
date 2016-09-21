@@ -1,7 +1,6 @@
 from scipy.linalg import block_diag 
 from numpy import array, arange, zeros, ones, identity, vstack, hstack, append
-
-__EPS = 1e-6
+from definitions import OptimError, __EPS
 
 ## constraint can be of kind equality ("eq"),
 # inequality ("ineq"). 
@@ -39,7 +38,7 @@ def cones_constraint(param):
 def com_kinematic_constraint(param):
 	comCons  = param["COMCons"]
 	if(comCons == None):
-		print "Error: com_kinematic_constraint activated but no constraints given "
+		raise OptimError("com_kinematic_constraint activated but no constraints given")
 	consA = []; consb = [];
 	for _, c in enumerate(comCons):
 		A = c[0]; b = c[1]

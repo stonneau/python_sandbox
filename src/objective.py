@@ -1,7 +1,6 @@
 from scipy.linalg import block_diag, norm
 from numpy import array, arange, zeros, ones, identity, vstack, hstack, append, sqrt, square
-
-__EPS = 1e-6
+from definitions import __EPS
 
 ## objective is  similar to constraint.
 # costs functions are chosen from a objective factory, with
