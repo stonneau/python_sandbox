@@ -28,12 +28,12 @@ def cones_constraint(param):
 	return A, b 
 	
 ## ("ineq","x")
-#  Defines the cone constraints for the COM acceleration
-#  and angular momentum. The active cone constraint for a 
+#  Defines the kinematic constraints for the COM position
+#  depending on the contact positions. The active com constraint for a 
 #  phase is given by the switching time phase. Thus the 
-#  resulting matrix is simply a diagonal stacking of the cone
+#  resulting matrix is simply a diagonal stacking of the constraint
 #  active at a given frame
-#  \param param requires "cones", "phases", "t_init_phases" and "dt"
+#  \param param requires "COMCons", "t_init_phases" and "dt"
 #  \return cone matrices for each phase
 def com_kinematic_constraint(param):
 	comCons  = param["COMCons"]
@@ -53,7 +53,7 @@ def com_kinematic_constraint(param):
 	b = hstack([consb[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
 	return A, b 
 	
-#~ ## ("eq","c_end")
+#~ ## ("eq","x_end")
 #~ #  constrains end com position and velocities to be equal to x_end
 #~ #  \param param requires "c_end", "t_init_phases"
 #~ #  \return 
@@ -67,6 +67,13 @@ def end_reached_constraint(param):
 	A = identity(3)	
 	b = x_end[0:3]
 	return A, b
+	
+#~ ## ("eq","c")
+#~ #  constrains end com position and velocities to be equal to x_end
+#~ #  \param param requires "c_end", "t_init_phases"
+#~ #  \return 
+def waypoint_reached_constraint(param, step, value):
+	return lambda(c): c[step] - value
 	
 #~ ## ("eq","dc_end")
 #~ #  constrains end com position and velocities to be equal to x_end
@@ -111,6 +118,10 @@ __constraint_factory = {
 	'com_kinematic_constraint' 		   	: {'type': 'ineq', 'var' : 'x', 'fun': com_kinematic_constraint},
 	'end_null_acceleration_constraint'  : {'type': 'eq'  , 'var' : 'w', 'fun': end_null_acceleration_constraint}}
 
+__parametric_constraint_factory = {
+	'waypoint_reached_constraint'		: {'type': 'eq'  , 'var' : 'c', 'fun': waypoint_reached_constraint},
+}
+
 def __filter_cons(factory, cond_name, cond_value):
 	return [c for c in factory if c[cond_name] == cond_value]
 
@@ -127,6 +138,17 @@ def __stack_filter_cons(factory, cons_type, var_type, params):
 			return A.dot(var_of_interest) - b
 		return {'type': cons_type, 'fun' : fun}
 		
+#initialize list of constraints, stack them in a single matrix
+#and create the constraint function
+def __gen_parametric_cons(param_constraint, params, args):
+	fun = param_constraint['fun'](params, *args)
+	var_type = param_constraint['var']
+	cons_type = param_constraint['type']
+	def fun2(var):
+		var_of_interest = params['simulate'](var)[var_type]
+		return fun(var_of_interest)
+	return {'type': cons_type, 'fun' : fun2}
+
 
 ## From a user selected set of constraints, initialize the constraints array to pass to a minimization
 #  problem.
@@ -138,11 +160,21 @@ def init_constraints(constraints, params):
 	c_types = ['eq', 'ineq'];
 	v_types = set([]); [v_types.add(__constraint_factory[name]['var' ]) for name in __constraint_factory]	
 	#retrieve all constraints
-	cons = [__constraint_factory[name] for name in constraints]
+	cons = [__constraint_factory[name] for name in set(constraints)]
 	# combine all possible constraint type and variable type => [['eq', 'w'], ['eq', 'x'], ..., ['ineq', 'w'] ...]
 	# and create constraint method for each of those
 	constraint_list = [__stack_filter_cons([c for c in cons if c['type'] == c_type], c_type, v_type, params) 
 								for c_type in  c_types for v_type in v_types]
+	return tuple([c for c in constraint_list if c != None])
+	
+## From a user selected set of constraints, initialize the constraints array to pass to a minimization
+#  problem. These constraints can be parametrized by extra arguments associated with 
+# their definition
+#  \param constraints list of tuple ('constraint_name', tuple(arg0, arg1...) ) describing the selected constraints and parameters
+#  \param params parameter dictionnary obtained from a call to init_problem
+#  \return a dictionnary of constraints to pass to the minimization problem
+def init_parametric_constraints(constraints, params):
+	constraint_list = [__gen_parametric_cons(__parametric_constraint_factory[cons_name], params, args) for cons_name, args in constraints]	
 	return tuple([c for c in constraint_list if c != None])
 	
 		

@@ -12,6 +12,7 @@ from init_problem      import *
 from main              import *
 from test_vars         import *
 from create_simulation import *
+from definitions import __EPS
 
 from scipy.linalg import block_diag 
 from numpy import array, arange, zeros, ones, identity, vstack, hstack, append
@@ -23,7 +24,8 @@ import matplotlib.pyplot as plt
 #~ *****************************
 def test_compute_CWC():
 	from test_vars import p, N, mass, g, mu
-	return compute_CWC(array(p[1]),array(N[1]), True, {"mass" : mass, "g": g, "mu":mu })
+	compute_CWC(array(p[1]),array(N[1]), True, {"mass" : mass, "g": g, "mu":mu })	
+	print "test_compute_CWC exited normally" 
 
 
 #~ *****************************
@@ -41,7 +43,7 @@ def test_create_simulation():
 	assert((simulation['c'][-1] == array([ 2., 2., 3.125])).all())
 	assert(len(simulation['x']) == len(simulation['w']))
 	assert(len(simulation['c']) == len(simulation['dc']) == len(simulation['ddc'])  == len(simulation['dL']))
-	print "test exited normally" 
+	print "test_create_simulation exited normally" 
 
 #~ *****************************
 #~ *  Problem
@@ -56,7 +58,7 @@ def test_init_problem():
 	assert(len(cones)) == 2
 	assert(cones[0].shape[0]) == 16
 	assert(cones[0].shape[1]) == 6
-	print "test exited normally" 
+	print "test_init_problem exited normally" 
 
 #~ *****************************
 #~ *  constraints
@@ -79,46 +81,58 @@ def test_cones_constraint():
 		assert A[i][i+1] == 6
 		assert A[i+1][i] == 7
 		assert A[i+1][i+1] == 8
-	print "test exited normally" 
+	print "test_cones_constraint exited normally" 
 	
 #~ *****************************
 #~ *  constraints
 #~ *****************************
 def test_com_kinematic_constraint():
 	param = {'COMCons' : [[identity(3),array([0,0,0])],[identity(3), array([0,0,1])]],
-	 'dt' : 0.5,
+	 'dt' : 1,
 	 't_init_phases' : [0,1,4]}
 	A, b = com_kinematic_constraint(param)
-	assert(b.shape==(24,))
-	assert(A.shape == (24,24))
-	test = zeros(24); test[8]=1;
+	assert(b.shape==(12,))
+	assert(A.shape == (12,24))
+	test = zeros(24); test[8]=1; test[14]=1; test[20]=1;
 	assert((A.dot(test) - b) <= 0).all()
-	test[9] = 1 
+	test[6] = 1 
 	assert(not((A.dot(test) - b) <= 0).all())
-	print "test exited normally" 
+	print "test_com_kinematic_constraint exited normally" 
 		
 def test_end_reached_constraint():
 	param = {'dt' : 0.5, "x_end" : [1,2,3,4,5,6], 't_init_phases' : [0,1.5]}
 	A, b = end_reached_constraint(param)
-	test_vec = append(zeros(12),param["x_end"])
-	assert(((A.dot(test_vec) - b) == zeros(18)).all())
-	print "test exited normally" 
+	test_vec = param["x_end"][:3]
+	assert(((A.dot(test_vec) - b) == zeros(3)).all())
+	print "test_end_reached_constraint exited normally" 
 
 def test_init_constraints():
+	end_target = array([1,2,3])
 	params = {'cones' : lambda : [array([[1,1,1,1,1,1],[1,1,1,1,1,1]]) for _ in range(2)],
 	 'dt' : 0.5,
 	 't_init_phases' : [0,1.5],
 	 "x_end" : [1,2,3,4,5,6],
-	 "simulate" : lambda x: { 'x' : array([i+1 for _ in arange(0,1.5,0.5) for i in range(1,7)]),
+	 "simulate" : lambda x: { 'c_end' : end_target * 2,
 							  'w' : array([1 for _ in arange(0,1.5,0.5) for i in range(6)])}}
 	 
 	cons = init_constraints(["end_reached_constraint","end_reached_constraint",'cones_constraint','cones_constraint'], params)
 	assert(len(cons)==2)
-	espected_eq_x = array(zeros(12).tolist() + ones(6).tolist() + zeros(12).tolist() + ones(6).tolist());
-	expected_ineq_w = 6*(ones(12));
-	assert((cons[0]['fun']([1])==espected_eq_x).all()) 
+	expected_ineq_w = 6*(ones(6));
+	assert((cons[0]['fun']([1])==end_target).all())
 	assert((cons[1]['fun']([1])==expected_ineq_w).all())
-	print "test exited normally" 
+	print "test_init_constraints exited normally" 
+	
+#~ *****************************
+#~ *  parametric constraints
+#~ *****************************
+def test_waypoint_reached_constraint():	
+	variables = {'c'  :  array([ [i + j for j in range (3)] for i in range(4)])}
+	espected_eq_x = np.array([1,2,3])
+
+	params = {'x_end' : [i for i in range(6)], 'simulate' : lambda(_): variables}
+	cons = init_parametric_constraints([(["waypoint_reached_constraint",([1, espected_eq_x]) ])], params)
+	assert((cons[0]['fun']([1])==zeros(3)).all()) 
+	print "test_waypoint_reached_constraint exited normally" 
 
 #~ *****************************
 #~ *  initial guess
@@ -145,6 +159,9 @@ def test_initial_guess_naive():
 #~ *  objective
 #~ *****************************
 def test_init_objective():
+	def __normsquared(v):
+		return square(norm(v))
+	
 	variables = {'dL' : [array([1,0,0]) for _ in range(4)], 
 				 'ddc': [array([0.5,0,0]) for i in range (4)], 
 				 'x'  :  array([ [0 for _ in range (6)] for _ in range(4)]),
@@ -160,40 +177,26 @@ def test_init_objective():
 	assert(objective(variables)==2.)
 
 	objective = init_objective([["min_ddc", 1]], params)
-	assert(objective(variables)==2.)
+	assert(objective(variables)==1.)
 
 	objective = init_objective([["min_ddc", 2]], params)
-	assert(objective(variables)==4.)
+	assert(objective(variables)==2.)
 
 	objective = init_objective([["end_reached", 1]], params)
-	assert(objective(variables)==norm(array(params['x_end'][0:3])) + 0.5 * norm(array(params['x_end'][3:6])))
+	assert(objective(variables)==__normsquared(array(params['x_end'][0:3])) + 0.5 * __normsquared(array(params['x_end'][3:6])))
 
 	objective = init_objective([["end_reached", 2]], params)
-	assert(objective(variables)==2* (norm(array(params['x_end'][0:3])) + 0.5 * norm(array(params['x_end'][3:6]))))
+	assert(objective(variables)==2* (__normsquared(array(params['x_end'][0:3])) + 0.5 * __normsquared(array(params['x_end'][3:6]))))
 
 	objective = init_objective([["min_dL", 0.5],["min_ddc", 2],["end_reached", 1]], params)
-	assert(objective(variables)==2 + 4 + norm(array(params['x_end'][0:3])) + 0.5 * norm(array(params['x_end'][3:6])))
+	assert(objective(variables)==2 + 2 + __normsquared(array(params['x_end'][0:3])) + 0.5 * __normsquared(array(params['x_end'][3:6])))
+	print "test_init_objective exited normally" 
 
 #~ *****************************
 #~ *  integration test
 #~ *****************************
 def test_optimize():
-
-	#~ print len(p_hyq)
-	#~ print len(N_hyq)
-
-	var_final, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, None, None, mu, mass, g)
-	#~ var_final, params = cone_optimization(p, N, [x_init, x_end], t_end_phases, dt, mu, mass, g)
-	#~ p = [[p_hyq_j[i] for i in range(0,len(p_hyq_j),4)] for p_hyq_j in p_hyq]
-	#~ N = [[N_hyq_j[i] for i in range(0,len(N_hyq_j),4)] for N_hyq_j in N_hyq]
-	#~ print N
-	#~ print len(N[0])
-	#~ print len(N_hyq[0])
-	#~ res, params = cone_optimization(p, N, [x_init_hyq, x_end_hyq], t_end_phases_3, dt, mu_hyq, mass, g)
-
-
-	#~ var_final = params['simulate'](res['x'])
-
+	var_final, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, None, None, mu, mass, g, verbose = True, score_treshold = 10000000)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	n = 100
@@ -216,7 +219,16 @@ def test_optimize():
 	ax.set_zlabel('Z Label')
 
 	plt.show()
+	print "test_optimize exited normally"
 
+#~ *****************************
+#~ *  integration test
+#~ *****************************
+def test_optimize_waypointConstraint():
+	var_final, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, None, None, mu, mass, g, verbose = True, constraint_set =[], 
+	parametric_constraint_set = [("waypoint_reached_constraint",(5, zeros(3)))], score_treshold = 10000000)
+	assert(norm(var_final['c'][5]) < __EPS)
+	print "test_optimize_waypointConstraint"
 
 #comment tests you do not want to run
 tests_run = {
@@ -229,8 +241,9 @@ tests_run = {
 	'test_initial_guess_naive' : test_initial_guess_naive,
 	'test_init_objective' : test_init_objective,
 	'test_optimize' : test_optimize,
-	'test_end_reached_minus_plus_constraint' : test_end_reached_minus_plus_constraint,
-	'test_com_kinematic_constraint' : test_com_kinematic_constraint
+	'test_com_kinematic_constraint' : test_com_kinematic_constraint,
+	'test_waypoint_reached_constraint' : test_waypoint_reached_constraint,
+	'test_optimize_waypointConstraint' : test_optimize_waypointConstraint
 }
 
 def run_tests():
