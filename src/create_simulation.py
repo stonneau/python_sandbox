@@ -4,6 +4,8 @@ from numpy.linalg import norm
 from definitions import __EPS
 	
 
+__lastcomputed = []
+__last_u = []
 ## Given an initial 6d X (c, dc), and a command vector u
 # computes the state c, dc at each step of the simulation
 #  \param param requires "x_init", and "dt"
@@ -16,16 +18,13 @@ def create_simulation(param):
 	m = param["mass"]
 	dt = param["dt"] #time step
 	# u is the control [ddc[0],...,ddc[n],L_p[0],L_p[n]]
-	__lastcomputed = []
-	__last_u = []
 	def res_fun(u):
+		global __lastcomputed
+		global __last_u
+		# return computed variables if already done at this step
 		for i, u_i in enumerate(__last_u):
 			if (u_i == u).all():
 				return __lastcomputed[i]
-		# return computed variables if already done at this step
-		#~ global __lastcomputed
-		#~ if __lastcomputed != None and ((__lastcomputed['u'] == u).all()):
-			#~ return __lastcomputed
 		# else init variables and integrate forward in time
 		ddc = [array(u[i:i+3]) for i in range(0, len(u)/2, 3)]
 		dL 	= [array(u[i:i+3]) for i in range(len(u)/2, len(u), 3)]
@@ -49,6 +48,9 @@ def create_simulation(param):
 		result = { 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL}		
 		__last_u.append(u)
 		__lastcomputed.append(result)
+		if len(__last_u) > 2* len(u):
+			__last_u = __last_u[len(u):]
+			__lastcomputed = __lastcomputed[len(u):]
 		return result
 	return res_fun
 
