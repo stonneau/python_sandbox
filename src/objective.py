@@ -27,6 +27,12 @@ def min_dL(param, weight):
 def min_ddc(param, weight):
 	return __sum_over('ddc', weight)
 	
+## ("dddc")
+#  Minimize jerk
+#  \return  cone matrices for each phase
+def min_dddc(param, weight):
+	return __sum_over('dddc', weight)
+	
 def __line(line_points, weight):
 	def fun(variables):		
 		c = variables["c"]
@@ -60,6 +66,7 @@ def end_reached(param, weight):
 __objective_factory = { 
 	'min_dL' : min_dL,
 	'min_ddc': min_ddc,
+	'min_dddc': min_dddc,
 	'line': line,
 	'end_reached' : end_reached}
 
