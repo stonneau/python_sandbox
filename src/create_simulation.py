@@ -1,7 +1,8 @@
 from scipy.linalg import block_diag 
-from numpy import array, hstack, cross, arange
+from numpy import array, hstack, cross, arange, copy
+from numpy.linalg import norm
+from definitions import __EPS
 	
-__lastcomputed = None
 
 ## Given an initial 6d X (c, dc), and a command vector u
 # computes the state c, dc at each step of the simulation
@@ -15,7 +16,12 @@ def create_simulation(param):
 	m = param["mass"]
 	dt = param["dt"] #time step
 	# u is the control [ddc[0],...,ddc[n],L_p[0],L_p[n]]
+	__lastcomputed = []
+	__last_u = []
 	def res_fun(u):
+		for i, u_i in enumerate(__last_u):
+			if (u_i == u).all():
+				return __lastcomputed[i]
 		# return computed variables if already done at this step
 		#~ global __lastcomputed
 		#~ if __lastcomputed != None and ((__lastcomputed['u'] == u).all()):
@@ -40,8 +46,10 @@ def create_simulation(param):
 		y = [m * (ddc_i - g_vec) for ddc_i in ddc]
 		w = [y[i].tolist() + (cross(c[i], y[i]) + dL[i]).tolist() for i,_ in enumerate(c)]
 		x = [c[i].tolist() + dc[i].tolist() for i,_ in enumerate(c)]
-		__lastcomputed = { 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL}
-		return __lastcomputed
+		result = { 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL}		
+		__last_u.append(u)
+		__lastcomputed.append(result)
+		return result
 	return res_fun
 
 

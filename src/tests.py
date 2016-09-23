@@ -196,7 +196,11 @@ def test_init_objective():
 #~ *  integration test
 #~ *****************************
 def test_optimize():
+	import time
+	start = time.clock()
 	var_final, params = cone_optimization(p_3, N_3, [x_init_3, x_end_3], t_end_phases_3, dt, None, None, mu, mass, g, verbose = True, score_treshold = 10000000)
+	elapsed = time.clock() - start
+	print "problem solved in " + str(elapsed)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	n = 100
@@ -218,7 +222,7 @@ def test_optimize():
 	ax.set_ylabel('Y Label')
 	ax.set_zlabel('Z Label')
 
-	plt.show()
+	#~ plt.show()
 	print "test_optimize exited normally"
 
 #~ *****************************
@@ -232,18 +236,18 @@ def test_optimize_waypointConstraint():
 
 #comment tests you do not want to run
 tests_run = {
-	'test_compute_CWC' : test_compute_CWC,
-	'test_create_simulation' : test_create_simulation,
-	'test_init_problem' : test_init_problem,
-	'test_cones_constraint' : test_cones_constraint,
-	'test_end_reached_constraint' : test_end_reached_constraint,
-	'test_init_constraints' : test_init_constraints,
-	'test_initial_guess_naive' : test_initial_guess_naive,
-	'test_init_objective' : test_init_objective,
+	#~ 'test_compute_CWC' : test_compute_CWC,
+	#~ 'test_create_simulation' : test_create_simulation,
+	#~ 'test_init_problem' : test_init_problem,
+	#~ 'test_cones_constraint' : test_cones_constraint,
+	#~ 'test_end_reached_constraint' : test_end_reached_constraint,
+	#~ 'test_init_constraints' : test_init_constraints,
+	#~ 'test_initial_guess_naive' : test_initial_guess_naive,
+	#~ 'test_init_objective' : test_init_objective,
 	'test_optimize' : test_optimize,
-	'test_com_kinematic_constraint' : test_com_kinematic_constraint,
-	'test_waypoint_reached_constraint' : test_waypoint_reached_constraint,
-	'test_optimize_waypointConstraint' : test_optimize_waypointConstraint
+	#~ 'test_com_kinematic_constraint' : test_com_kinematic_constraint,
+	#~ 'test_waypoint_reached_constraint' : test_waypoint_reached_constraint,
+	#~ 'test_optimize_waypointConstraint' : test_optimize_waypointConstraint
 }
 
 def run_tests():
