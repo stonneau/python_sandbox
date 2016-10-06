@@ -30,7 +30,8 @@ def create_simulation(param):
 		dL 	= [array(u[i:i+3]) for i in range(len(u)/2, len(u), 3)]
 		c  	= [init_c]; 
 		dc 	= [init_dc];		
-		dddc= [(ddc[i+1] - ddc[i]) / dt for i in range(len(ddc)-1)];		
+		dddc= [(ddc[i+1] - ddc[i]) / dt for i in range(len(ddc)-1)];	
+		ddL= [(dL[i+1] - dL[i]) / dt for i in range(len(dL)-1)];		
 		# dc
 		# ambiguity comes from the fact that control vector u has one less entry than the state vector x
 		# euler integration for velocity gives:
@@ -38,7 +39,8 @@ def create_simulation(param):
 		# but is effectively implemented as dc[i+1] = ddc[i] *dt + dc[i] since ddc is offset
 		[dc.append(dc[-1] + dt *ddc_i ) for ddc_i in ddc ];		
 		#c
-		[ c.append(c[-1] + dt *0.5*(dc[i] + dc[i-1])) for i in range(1,len(dc))];		
+		#~ [ c.append(c[-1] + dt *0.5*(dc[i] + dc[i-1])) for i in range(1,len(dc))];		
+		[ c.append(c[-1] + dt *(dc[i]) + dt *dt * 0.5 * ddc[i]) for i in range(0,len(ddc))];		
 		#remove init values from c and dc
 		c  =  c[1:]
 		dc = dc[1:]
@@ -46,7 +48,7 @@ def create_simulation(param):
 		y = [m * (ddc_i - g_vec) for ddc_i in ddc]
 		w = [y[i].tolist() + (cross(c[i], y[i]) + dL[i]).tolist() for i,_ in enumerate(c)]
 		x = [c[i].tolist() + dc[i].tolist() for i,_ in enumerate(c)]
-		result = { 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'dddc' : dddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL}		
+		result = { "x_init" : param["x_init"], 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'dddc' : dddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL, 'ddL' : ddL}		
 		#~ __last_u.append(u)
 		#~ __lastcomputed.append(result)
 		#~ if len(__last_u) > 2* len(u):

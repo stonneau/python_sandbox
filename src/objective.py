@@ -21,6 +21,12 @@ def __sum_over(var_name, weight):
 def min_dL(param, weight):
 	return __sum_over('dL', weight)
 	
+## ("ddL")
+#  Minimize angular momentum variation
+#  \return  cone matrices for each phase
+def min_ddL(param, weight):
+	return __sum_over('ddL', weight)
+	
 ## ("ddc")
 #  Minimize angular momentum variation
 #  \return  cone matrices for each phase
@@ -64,6 +70,7 @@ def end_reached(param, weight):
 	return lambda variables : weight * (__normsquared(variables["c"][-1] - x_end) + 0.5 * __normsquared(variables["dc"][-1] - v_end))
 	
 __objective_factory = { 
+	'min_ddL' : min_ddL,
 	'min_dL' : min_dL,
 	'min_ddc': min_ddc,
 	'min_dddc': min_dddc,
