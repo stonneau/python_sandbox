@@ -19,8 +19,9 @@ def cone_optimization(p, N, x_input, t_end_phases, dt, cones =None, COMConstrain
 constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constraint'], parametric_constraint_set = [], score_treshold = 500):
 	params = init_problem(p, N, x_input, t_end_phases, dt, cones, COMConstraints, mu, mass, g, simplify_cones)
 	cons = init_constraints(constraint_set, params) + init_parametric_constraints(parametric_constraint_set, params)
-	#~ objective = init_objective([["min_dddc", 0.001], ["min_dL", 10]],params)
-	objective = init_objective([["min_dddc", 0.05], ["min_ddc", 0.05], ["min_ddL", 40]],params)
+	objective = init_objective([["min_ddc", 0.001], ["min_dL", 10]],params)
+	#~ objective = init_objective([["min_dddc", 0.05], ["min_ddc", 0.05], ["min_ddL", 40]],params)
+	#~ objective = init_objective([["min_ddL", 40]],params)
 	#~ objective = init_objective([["min_dL", 10]],params)
 	#~ objective = init_objective([["line", 10]],params)
 	#~ objective = init_objective([["min_ddc", 10], ["min_dddc", 1]],params)
