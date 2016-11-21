@@ -64,8 +64,8 @@ def end_reached_constraint(param):
 	#~ dt = param["dt"]
 	#~ zero_matrix = zeros((x_size,x_size))
 	#~ A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [identity(x_size)])
-	A = identity(3)	
-	b = x_end[0:3]
+	A = 10000 * identity(3)	
+	b = 10000 * array(x_end[0:3])
 	return A, b
 	
 #~ ## ("eq","c")
@@ -135,7 +135,7 @@ def __stack_filter_cons(factory, cons_type, var_type, params):
 		b = array([el for els in mat_and_vector for el in els[1] ])
 		def fun(var):
 			var_of_interest = params['simulate'](var)[var_type]
-			return A.dot(var_of_interest) - b
+			return -(A.dot(var_of_interest) - b)
 		return {'type': cons_type, 'fun' : fun}
 		
 #initialize list of constraints, stack them in a single matrix
