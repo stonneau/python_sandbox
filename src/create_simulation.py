@@ -47,8 +47,11 @@ def create_simulation(param):
 		#w
 		y = [m * (ddc_i - g_vec) for ddc_i in ddc]
 		w = [y[i].tolist() + (cross(c[i], y[i]) + dL[i]).tolist() for i,_ in enumerate(c)]
+		# WARNING ! in robustequilibrium lib, the GIWC computation is reversed. Therefore it is required
+		# to test equilibrium with -w rather than w ...  changing this while robust-equilibrium lib is not updated
 		x = [c[i].tolist() + dc[i].tolist() for i,_ in enumerate(c)]
-		result = { "x_init" : param["x_init"], 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'dddc' : dddc, 'x' : array(x).flatten() , 'w':  array(w).flatten(), 'u':  u, 'dL' : dL, 'ddL' : ddL}		
+		result = { "x_init" : param["x_init"], 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'dddc' : dddc, 
+		'x' : array(x).flatten() , 'w':  -array(w).flatten(), 'u':  u, 'dL' : dL, 'ddL' : ddL}		
 		#~ __last_u.append(u)
 		#~ __lastcomputed.append(result)
 		#~ if len(__last_u) > 2* len(u):
