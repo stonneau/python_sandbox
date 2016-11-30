@@ -23,8 +23,15 @@ def cones_constraint(param):
 	cones  = param["cones"]()	
 	phases = param["t_init_phases"]
 	dt = param["dt"]
-	A = block_diag(*[cones[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
+	indexes = [index for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))]
+	for i in range(0,len(indexes)):
+		if not (indexes[i] == indexes[i+1]):
+			indexes[i] = indexes[i+1] #state before flight constrained to be in flight cone
+			break
+	A = block_diag(*[cones[index] for _, index in enumerate(indexes)])
+	#~ A = block_diag(*[cones[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
 	b = zeros(A.shape[0])
+	b = -1 * ones(A.shape[0])
 	return A, b 
 	
 ## ("ineq","x")
@@ -125,6 +132,8 @@ __parametric_constraint_factory = {
 def __filter_cons(factory, cond_name, cond_value):
 	return [c for c in factory if c[cond_name] == cond_value]
 
+from numpy import where
+
 #initialize list of constraints, stack them in a single matrix
 #and create the constraint function
 def __stack_filter_cons(factory, cons_type, var_type, params):
@@ -135,6 +144,10 @@ def __stack_filter_cons(factory, cons_type, var_type, params):
 		b = array([el for els in mat_and_vector for el in els[1] ])
 		def fun(var):
 			var_of_interest = params['simulate'](var)[var_type]
+			#~ if(var_type == "w"):
+				#~ print "debug"
+				#~ print "raa", len(where(-(A.dot(var_of_interest) - b)<=0))
+				#~ print "end debug"
 			return -(A.dot(var_of_interest) - b)
 		return {'type': cons_type, 'fun' : fun}
 		
