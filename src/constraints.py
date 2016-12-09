@@ -34,6 +34,26 @@ def cones_constraint(param):
 	b = -1 * ones(A.shape[0])
 	return A, b 
 	
+## ("ineq","w")
+#  Defines the cone constraints for the COM acceleration
+#  and angular momentum. The active cone constraint for a 
+#  phase is given by the switching time phase. Thus the 
+#  resulting matrix is simply a diagonal stacking of the cone
+#  active at a given frame
+#  \param param requires "cones", "phases", "t_init_phases" and "dt"
+#  \return cone matrices for each phase
+def cones_constraint_deriv(param):
+	cones  = param["cones"]()	
+	phases = param["t_init_phases"]
+	dt = param["dt"]
+	indexes = [index for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))]
+	for i in range(0,len(indexes)):
+		if not (indexes[i] == indexes[i+1]):
+			indexes[i] = indexes[i+1] #state before flight constrained to be in flight cone
+			break
+	A = block_diag(*[cones[index] for _, index in enumerate(indexes)])
+	return A 
+	
 ## ("ineq","x")
 #  Defines the kinematic constraints for the COM position
 #  depending on the contact positions. The active com constraint for a 
@@ -74,7 +94,15 @@ def end_reached_constraint(param):
 	A = 10000 * identity(3)	
 	b = 10000 * array(x_end[0:3])
 	return A, b
-	
+
+#~ ## ("eq","x_end")
+#~ #  constrains end com position and velocities to be equal to x_end
+#~ #  \param param requires "c_end", "t_init_phases"
+#~ #  \return 
+def end_reached_constraint_deriv(param):
+	A = 10000 * identity(3)	
+	return A
+
 #~ ## ("eq","c")
 #~ #  constrains end com position and velocities to be equal to x_end
 #~ #  \param param requires "c_end", "t_init_phases"
@@ -96,6 +124,14 @@ def end_speed_constraint(param):
 	A = identity(3)	
 	b = x_end[3:6]
 	return A, b
+	
+#~ ## ("eq","dc_end")
+#~ #  constrains end com position and velocities to be equal to x_end
+#~ #  \param param requires "c_end", "t_init_phases"
+#~ #  \return 
+def end_speed_constraint_deriv(param):
+	A = identity(3)	
+	return A
 	
 #~ ## ("eq","w")
 #~ #  constrains end com position and velocities to be equal to x_end
@@ -119,9 +155,9 @@ def __make_id_half(x_size):
 
 
 __constraint_factory = { 
-	'end_reached_constraint'			: {'type': 'eq'  , 'var' : 'c_end', 'fun': end_reached_constraint},
-	'end_speed_constraint'				: {'type': 'eq'  , 'var' : 'dc_end', 'fun': end_speed_constraint},
-	'cones_constraint' 		        	: {'type': 'ineq', 'var' : 'w', 'fun': cones_constraint},
+	'end_reached_constraint'			: {'type': 'eq'  , 'var' : 'c_end' , 'fun': end_reached_constraint, 'jac': end_reached_constraint_deriv},
+	'end_speed_constraint'				: {'type': 'eq'  , 'var' : 'dc_end', 'fun': end_speed_constraint  , 'jac': end_speed_constraint_deriv},
+	'cones_constraint' 		        	: {'type': 'ineq', 'var' : 'w', 'fun': cones_constraint, 'jac': cones_constraint_deriv},
 	'com_kinematic_constraint' 		   	: {'type': 'ineq', 'var' : 'x', 'fun': com_kinematic_constraint},
 	'end_null_acceleration_constraint'  : {'type': 'eq'  , 'var' : 'w', 'fun': end_null_acceleration_constraint}}
 
@@ -138,6 +174,7 @@ from numpy import where
 #and create the constraint function
 def __stack_filter_cons(factory, cons_type, var_type, params):
 	mat_and_vector= [c['fun'](params) for c in factory if c['var'] == var_type]
+	mat_deriv = [c['jac'](params) for c in factory if c['var'] == var_type]
 	if mat_and_vector:
 		# stack matrices
 		A = vstack([c[0] for c in mat_and_vector])
@@ -149,6 +186,11 @@ def __stack_filter_cons(factory, cons_type, var_type, params):
 				#~ print "raa", len(where(-(A.dot(var_of_interest) - b)<=0))
 				#~ print "end debug"
 			return -(A.dot(var_of_interest) - b)
+		# stack derivative matrix (assuming everything is linear)
+		A_jac = vstack([c for c in mat_deriv])
+		def jac(var):
+			return A_jac
+		#~ return {'type': cons_type, 'fun' : fun, 'jac' : jac}
 		return {'type': cons_type, 'fun' : fun}
 		
 #initialize list of constraints, stack them in a single matrix
