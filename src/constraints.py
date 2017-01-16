@@ -24,7 +24,7 @@ def cones_constraint(param):
 	phases = param["t_init_phases"]
 	dt = param["dt"]
 	indexes = [index for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))]
-	for i in range(0,len(indexes)):
+	for i in range(0,len(indexes)-1):
 		if not (indexes[i] == indexes[i+1]):
 			indexes[i] = indexes[i+1] #state before flight constrained to be in flight cone
 			break
