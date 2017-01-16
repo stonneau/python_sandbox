@@ -25,23 +25,27 @@ constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constrai
 	#print "p[1] = "
 	#print params["p"][1]
 	cons = init_constraints(constraint_set, params) + init_parametric_constraints(parametric_constraint_set, params)
-	objective = init_objective([["min_ddc", 1]],params)
+	objective = init_objective([["min_ddc", 1],["alpha_one",100]],params)
 	#~ objective = init_objective([["min_dddc", 0.001], ["min_ddc", 0.001], ["min_ddL", 40]],params)
 	res= {'success' : False}
 	if(len(initial_guess)>0):
+			initial_guess.append(1) # alpha variable
 			print "try with velocity_initial_guess : ",initial_guess
 			res = minimize(objective, initial_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
+			print "params alpha = ", res
 	if (res ['success'] == False or res ['fun'] > score_treshold):
 		if(verbose):
 			print "error in minimization, trying with naive heuristic"
 		init_guess = initial_guess_naive(params)
 		res = minimize(objective, init_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
+		print "res after minimize = ", res
 	if (res ['success'] == False or res ['fun'] > score_treshold):
 		if(verbose):
 			print "error in minimization, trying with support heuristic"
-		objective = init_objective([["min_ddc", 1]],params)
+		objective = init_objective([["min_ddc", 1],["alpha_one",100]],params)
 		init_guess = initial_guess_support(params)
 		res = minimize(objective, init_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
+		print "res after minimize = ", res
 	if res ['success'] == False:
 		raise OptimError("OPTIMIZATION FAILED EVERY TIME")
 	var_final = params['simulate'](res['x'])

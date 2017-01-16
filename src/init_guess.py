@@ -42,6 +42,7 @@ def initial_guess_naive(params):
  	# now add 0 dL
  	res= acc + [0 for _ in range(0,len(acc))]
 	assert len(res)%2 == 0, "in initial_guess_naive, u is not par"		
+	res.append(1) # alpha variable
  	return res
  	
 def __barycenter(points):
@@ -80,6 +81,7 @@ def initial_guess_support(params):
  	#~ res = acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)] 	
  	res = acc + [0 for _ in range(0,len(acc))]
  	assert len(res)%2 == 0, "in initial_guess_support, u is not par"
+	res.append(1) # alpha variable
 	print "res in init_guess_support : ",res
  	return res
 
@@ -118,6 +120,7 @@ def initial_guess_support_velocity(params):
 	#~ res = acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)]
 	res = acc + [0 for _ in range(0,len(acc))]
 	assert len(res)%2 == 0, "in initial_guess_support, u is not par"
+	res.append(1) # alpha variable
 	print "res in init_guess_support : ",res
 	return res
  	
@@ -147,6 +150,7 @@ def initial_guess_naive_noise(params):
  	#~ res = acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)]
  	res = acc + [0 for _ in range(0,len(acc))]
  	assert len(res)%2 == 0, "in initial_guess_naive_noise, u is not par"
+	res.append(1) # alpha variable
  	return res
  	
 ## initial guess
@@ -166,4 +170,5 @@ def initial_guess_naive_gravity_compensation(params):
 	res = [el for _ in arange(0,phases[-1]-__EPS,dt) for el in ddc]
 	res += [0 for _ in range(0,len(acc))]
  	assert len(res)%2 == 0, "in initial_guess_naive_gravity_compensation, u is not par"
+	res.append(1) # alpha variable
  	return res

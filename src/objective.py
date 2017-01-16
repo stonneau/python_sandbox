@@ -1,6 +1,7 @@
 from scipy.linalg import block_diag, norm
 from numpy import array, arange, zeros, ones, identity, vstack, hstack, append, sqrt, square
 from definitions import __EPS
+import math
 
 ## objective is  similar to constraint.
 # costs functions are chosen from a objective factory, with
@@ -68,6 +69,11 @@ def end_reached(param, weight):
 	x_end  = array(param["x_end"][0:3])
 	v_end  = array(param["x_end"][3:6])
 	return lambda variables : weight * (__normsquared(variables["c"][-1] - x_end) + 0.5 * __normsquared(variables["dc"][-1] - v_end))
+
+# constraint alpha value to be 1
+def alpha_one(param,weight):
+	print "objective alpha = ", param['alpha']
+	return lambda variables : weight * (math.fabs(1-param["alpha"]))
 	
 __objective_factory = { 
 	'min_ddL' : min_ddL,
@@ -75,7 +81,8 @@ __objective_factory = {
 	'min_ddc': min_ddc,
 	'min_dddc': min_dddc,
 	'line': line,
-	'end_reached' : end_reached}
+	'end_reached' : end_reached,
+	'alpha_one' : alpha_one}
 
 ## From a user selected set of cost functions, generate objective functions
 #  \param objective list of couple (string, value) describing the 

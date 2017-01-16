@@ -47,7 +47,8 @@ def init_problem(p, N, x_input, t_end_phases, dt, cones = None, COMConstraints =
 	         "COMCons" 		: COMConstraints,
 	         #t_phases in updated to each starting phase time and one final phase
 	         #~ "t_init_phases": [dt] +[t_end_phases[i] + dt for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
-	         "t_init_phases": [0] + [t_end_phases[i] for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]] }
+					 "t_init_phases": [0] + [t_end_phases[i] for i in range(len(t_end_phases)-1)] + [t_end_phases[-1]],
+					 "alpha" : 1}
 	         
 	#defining cone method compute all cones on first call, otherwise return hidden variable __cones	
 	if cones == None:

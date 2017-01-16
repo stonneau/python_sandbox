@@ -26,21 +26,24 @@ def create_simulation(param):
 			#~ if (u_i == u).all():
 				#~ return __lastcomputed[i]
 		# else init variables and integrate forward in time
+		alpha = u[-1]
+		u = u[:-1]
+		dta = dt*alpha
 		ddc = [array(u[i:i+3]) for i in range(0, len(u)/2, 3)]
 		dL 	= [array(u[i:i+3]) for i in range(len(u)/2, len(u), 3)]
 		c  	= [init_c]; 
 		dc 	= [init_dc];		
-		dddc= [(ddc[i+1] - ddc[i]) / dt for i in range(len(ddc)-1)];	
-		ddL= [(dL[i+1] - dL[i]) / dt for i in range(len(dL)-1)];		
+		dddc= [(ddc[i+1] - ddc[i]) / dta for i in range(len(ddc)-1)];
+		ddL= [(dL[i+1] - dL[i]) / dta for i in range(len(dL)-1)];
 		# dc
 		# ambiguity comes from the fact that control vector u has one less entry than the state vector x
 		# euler integration for velocity gives:
 		# dc[i+1] = ddc[i+1] *dt + dc[i].
 		# but is effectively implemented as dc[i+1] = ddc[i] *dt + dc[i] since ddc is offset
-		[dc.append(dc[-1] + dt *ddc_i ) for ddc_i in ddc ];		
+		[dc.append(dc[-1] + dta *ddc_i ) for ddc_i in ddc ];
 		#c
 		#~ [ c.append(c[-1] + dt *0.5*(dc[i] + dc[i-1])) for i in range(1,len(dc))];		
-		[ c.append(c[-1] + dt *(dc[i]) + dt *dt * 0.5 * ddc[i]) for i in range(0,len(ddc))];		
+		[ c.append(c[-1] + dta *(dc[i]) + dta *dta * 0.5 * ddc[i]) for i in range(0,len(ddc))];
 		#remove init values from c and dc
 		c  =  c[1:]
 		dc = dc[1:]
@@ -52,7 +55,7 @@ def create_simulation(param):
 		# to test equilibrium with -w rather than w ...  changing this while robust-equilibrium lib is not updated
 		x = [c[i].tolist() + dc[i].tolist() for i,_ in enumerate(c)]
 		result = { "x_init" : param["x_init"], 'c' : c, 'c_end' : c[-1], 'dc_end' : dc[-1], 'dc': dc, 'ddc' : ddc, 'dddc' : dddc, 
-		'x' : array(x).flatten() , 'w':  -array(w).flatten(), 'u':  u, 'dL' : dL, 'ddL' : ddL}		
+		'x' : array(x).flatten() , 'w':  -array(w).flatten(), 'u':  u, 'dL' : dL, 'ddL' : ddL, 'alpha' : alpha}
 		#~ __last_u.append(u)
 		#~ __lastcomputed.append(result)
 		#~ if len(__last_u) > 2* len(u):
