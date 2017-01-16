@@ -58,5 +58,6 @@ def init_problem(p, N, x_input, t_end_phases, dt, cones = None, COMConstraints =
 		def f(phase ): return lambda: cones[phase]
 		param['cones'] = __def_access_param_method(param, "cones", [f(phase) for phase in range(len(p))])
 	param['simulate'] = create_simulation(param)
-														  
+	print "x_init ", 	param["x_init"]
+	print "x_end ", 	param["x_end"]
 	return param

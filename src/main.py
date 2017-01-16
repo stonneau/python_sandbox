@@ -18,6 +18,12 @@ from scipy.optimize import minimize
 def cone_optimization(p, N, x_input, t_end_phases, dt, cones =None, COMConstraints = None, mu =0.5, mass = 75, g = 9.81, simplify_cones = True, verbose=False,
 constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constraint'], parametric_constraint_set = [], score_treshold = 5000, initial_guess = []):
 	params = init_problem(p, N, x_input, t_end_phases, dt, cones, COMConstraints, mu, mass, g, simplify_cones)
+	#print "params :"
+	#print params
+	#print "p ="
+	#print params["p"]
+	#print "p[1] = "
+	#print params["p"][1]
 	cons = init_constraints(constraint_set, params) + init_parametric_constraints(parametric_constraint_set, params)
 	objective = init_objective([["min_ddc", 1]],params)
 	#~ objective = init_objective([["min_dddc", 0.001], ["min_ddc", 0.001], ["min_ddL", 40]],params)
@@ -39,5 +45,7 @@ constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constrai
 	if res ['success'] == False:
 		raise OptimError("OPTIMIZATION FAILED EVERY TIME")
 	var_final = params['simulate'](res['x'])
+	print "final c_end", var_final["c_end"]
+	print "final dc_end", var_final["dc_end"]
 	return var_final, params
 
