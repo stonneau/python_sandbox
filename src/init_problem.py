@@ -24,7 +24,7 @@ def __def_access_param_method(param, keyword, fun):
 #  To initialize it, for each phase the inputs expected
 #  are the list of contact points and normals, the COM positions at start and
 #  end phases, the duration of each phase, and finally discretization step.
-#  which formulation is adopted: either COM acceleration is the variable, or forces are the variables
+#  which formulation is adopted: either COM acceleration is the variable, or forces are the variables
 #  \param p list of 3d contact positions
 #  \param N list of 3d contact normals
 #  \param x_input: list of exactly two 6D vectors, indicating start and end positions and velocities of the com 

@@ -22,7 +22,7 @@ def normalize(v):
 # straight line from start to goal
 # accelerate constantly half the way, then decelerate constantly 
 # by the same amount. For this solve for ddc such that
-# at half time, the robot is mid-way.
+# at half time, the robot is mid-way.
 # angular momentum variation set to 0 all along
 # assume velocities at start and goal are zeros
 # assume velocities at start and goal are zeros
@@ -55,7 +55,7 @@ def __barycenter(points):
 # straight line from start to goal
 # accelerate constantly half the way, then decelerate constantly 
 # by the same amount. For this solve for ddc such that
-# at half time, the robot is mid-way.
+# at half time, the robot is mid-way.
 # angular momentum variation set to 0 all along
 # assume velocities at start and goal are zeros
 # assume velocities at start and goal are zeros
@@ -80,14 +80,53 @@ def initial_guess_support(params):
  	#~ res = acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)] 	
  	res = acc + [0 for _ in range(0,len(acc))]
  	assert len(res)%2 == 0, "in initial_guess_support, u is not par"
+	print "res in init_guess_support : ",res
  	return res
+
+## initial guess with 2 lines, the middle point lying at the centroid
+# of the support polygon
+# straight line from start to goal
+# accelerate constantly half the way, then decelerate constantly
+# by the same amount. For this solve for ddc such that
+# at half time, the robot is mid-way.
+# angular momentum variation set to 0 all along
+# take the initial and final velocity from the configs
+# \param requires x_init, x_end, dt and t_init_phases
+# \return velocities at start and goal are zeros
+def initial_guess_support_velocity(params):
+	phases = params["t_init_phases"]; x_init = params["x_init"];
+	x_end  = params["x_end"]; dt = params["dt"];
+	barycenter = __barycenter(params["p"][1])
+	barycenter[2] = (x_init[2] + x_end[2]) /2.
+	c_0 = array(x_init[0:3]); c_end = array(x_end[0:3])
+	dc_0 = array(x_init[3:6]) ; dc_end = array(x_end[3:6])
+	c_mid_1 = (barycenter - c_0) / 2.; # mid-point
+	c_mid_2 = (c_end - barycenter) / 2.; # mid-point
+	t_mid = phases[-1]/2.; # mid-time
+	print "init_guess_support_velocity : "
+	print "c_mid_1 = ", c_mid_1
+	print "c_mid_2 = ", c_mid_2
+	print "t_mid = ", t_mid
+
+	ddc1 = 2*(c_mid_1 / t_mid**2);
+	ddc2 = 2*(c_mid_2 / t_mid**2);
+	#now find closest x*dt < t_mid, with x integer
+	t_mid = floor(t_mid /dt)*dt
+	#now just apply it for half the time, then negatively the rest
+	acc = [el for _ in arange(0,t_mid-__EPS,dt) for el in ddc1] + [-el for _ in arange(t_mid,phases[-1]-__EPS,dt) for el in ddc2 ]
+	# now add 0 dL
+	#~ res = acc + [0 for _ in range(0,3) for _ in arange(0,phases[-1]-__EPS,dt)]
+	res = acc + [0 for _ in range(0,len(acc))]
+	assert len(res)%2 == 0, "in initial_guess_support, u is not par"
+	print "res in init_guess_support : ",res
+	return res
  	
 ## initial guess
 # which tries to compute two straight lines, with one middle
 # point in the middle cone.
 # accelerate constantly half the way, then decelerate constantly 
 # by the same amount. For this solve for ddc such that
-# at half time, the robot is mid-way.
+# at half time, the robot is mid-way.
 # angular momentum variation set to 0 all along
 # assume velocities at start and goal are zeros
 # assume velocities at start and goal are zeros
@@ -112,7 +151,7 @@ def initial_guess_naive_noise(params):
  	
 ## initial guess
 # that simply compensates for the gravity
-# at half time, the robot is mid-way.
+# at half time, the robot is mid-way.
 # angular momentum variation set to 0 all along
 # assume velocities at start and goal are zeros
 # assume velocities at start and goal are zeros
