@@ -32,18 +32,18 @@ constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constrai
 			initial_guess.append(1) # alpha variable
 			print "try with velocity_initial_guess : ",initial_guess
 			res = minimize(objective, initial_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
-	if (res ['success'] == False or res ['fun'] > score_treshold):
+	if (res ['fun'] > score_treshold):
 		if(verbose):
 			print "error in minimization, trying with naive heuristic"
 		init_guess = initial_guess_naive(params)
 		res = minimize(objective, init_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
-	if (res ['success'] == False or res ['fun'] > score_treshold):
+	if (res ['fun'] > score_treshold):
 		if(verbose):
 			print "error in minimization, trying with support heuristic"
 		objective = init_objective([["min_dddc", 0.001], ["min_ddc", 1],["alpha_one",1]],params)
 		init_guess = initial_guess_support(params)
 		res = minimize(objective, init_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
-	if res ['success'] == False:
+	if (res ['fun'] > score_treshold):
 		raise OptimError("OPTIMIZATION FAILED EVERY TIME")
 	var_final = params['simulate'](res['x'])
 	print "final c_end", var_final["c_end"]
