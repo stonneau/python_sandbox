@@ -25,7 +25,7 @@ constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constrai
 	res= {'success' : False}
 	if(len(initial_guess)>0):
 			initial_guess.append(1) # alpha variable
-			print "try with velocity_initial_guess : ",initial_guess
+			print "try with velocity_initial_guess : "
 			res = minimize(objective, initial_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
 	if (res ['fun'] > score_treshold):
 		if(verbose):

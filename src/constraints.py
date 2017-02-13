@@ -73,8 +73,8 @@ def end_reached_constraint(param):
 	#~ A = block_diag(*[zero_matrix for _ in (arange(phases[0],phases[-1]-dt,dt))] + [identity(x_size)])
 	A = identity(3)
 	b = array(x_end[0:3])
-	print "end reached constraint. A ", A
-	print "b", b
+	#print "end reached constraint. A ", A
+	#print "b", b
 	return A, b
 	
 #~ ## ("eq","c")

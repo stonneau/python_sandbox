@@ -82,7 +82,6 @@ def initial_guess_support(params):
  	res = acc + [0 for _ in range(0,len(acc))]
  	assert len(res)%2 == 0, "in initial_guess_support, u is not par"
 	res.append(1) # alpha variable
-	print "res in init_guess_support : ",res
  	return res
 
 ## initial guess with 2 lines, the middle point lying at the centroid

@@ -72,7 +72,6 @@ def end_reached(param, weight):
 
 # constraint alpha value to be 1
 def alpha_one(param,weight):
-	print "objective alpha = ", param['alpha']
 	return lambda variables : weight * (math.fabs(1.-variables["alpha"]))
 	
 __objective_factory = { 

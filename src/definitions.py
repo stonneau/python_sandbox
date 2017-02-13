@@ -16,9 +16,9 @@ class OptimError(Error):
 		self.message = message
 		
 	def __repr__(self):
-		return message
+		return self.message
 
 	def __str__(self):
-		return message
+		return self.message
 
 __EPS = 1e-6
