@@ -12,13 +12,13 @@ class Error(Exception):
 
 class OptimError(Error):
 	"""Raised when problem is not solved"""
-	def __init__(self, message):
-		self.message = message
+	def __init__(self, Error):
+		self.message = Error
 		
 	def __repr__(self):
-		return message
+		return Error
 
 	def __str__(self):
-		return message
+		return Error
 
 __EPS = 1e-6
