@@ -31,7 +31,7 @@ def cones_constraint(param):
 	A = block_diag(*[cones[index] for _, index in enumerate(indexes)])
 	#~ A = block_diag(*[cones[index] for index, _ in enumerate(phases[:-1]) for _ in (arange(phases[index],phases[index+1]-__EPS,dt))])
 	b = zeros(A.shape[0])
-	b = -1 * ones(A.shape[0])
+	#~ b = -1 * ones(A.shape[0])
 	return A, b 
 	
 ## ("ineq","x")

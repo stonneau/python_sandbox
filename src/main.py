@@ -17,10 +17,11 @@ from scipy.optimize import minimize
 #formulation of the optimization problem
 def cone_optimization(p, N, x_input, t_end_phases, dt, cones =None, COMConstraints = None, mu =0.5, mass = 75, g = 9.81, simplify_cones = True, verbose=False,
 constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constraint'], parametric_constraint_set = [], score_treshold = 5000, initial_guess = []):
-	params = init_problem(p, N, x_input, t_end_phases, dt, cones, COMConstraints, mu, mass, g, simplify_cones)
+	params = init_problem(p, N, x_input, t_end_phases, dt, cones, None, mu, mass, g, simplify_cones)
 	print "constraints used : ",constraint_set
 	cons = init_constraints(constraint_set, params) + init_parametric_constraints(parametric_constraint_set, params)
-	objective = init_objective([["min_dddc", 0.001], ["min_ddc", 1.],["alpha_one",100.]],params)
+	#~ objective = init_objective([["min_dddc", 0.001], ["min_ddc", 1.],["alpha_one",100.]],params)
+	objective = init_objective([["alpha_one",100.]],params)
 	#~ objective = init_objective([["min_dddc", 0.001], ["min_ddc", 0.001], ["min_ddL", 40]],params)
 	res= {'success' : False}
 	if(len(initial_guess)>0):
