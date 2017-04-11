@@ -25,12 +25,13 @@ constraint_set=['cones_constraint', 'end_reached_constraint','end_speed_constrai
 	#~ objective = init_objective([["min_dddc", 0.001], ["min_ddc", 0.001], ["min_ddL", 40]],params)
 	res= {'success' : False}
 	if(len(initial_guess)>0):
-			initial_guess.append(1) # alpha variable
-			print "try with velocity_initial_guess : "
-			res = minimize(objective, initial_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
-	if (res ['fun'] > score_treshold):
-		if(verbose):
-			print "error in minimization, trying with naive heuristic"
+		print "using init guess"
+		initial_guess.append(1) # alpha variable
+		print "try with velocity_initial_guess : "
+		res = minimize(objective, initial_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
+	if (len(initial_guess) == 0 or res ['fun'] > score_treshold):
+		#~ if(verbose):
+			#~ print "error in minimization, trying with naive heuristic"
 		init_guess = initial_guess_naive(params)
 		res = minimize(objective, init_guess, constraints=cons, method='SLSQP', options={'disp': verbose, 'ftol': 1e-06, 'maxiter' : 500})
 	if (res ['fun'] > score_treshold):
